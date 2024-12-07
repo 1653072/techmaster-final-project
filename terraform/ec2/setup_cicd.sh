@@ -55,3 +55,46 @@ docker run -p 9080:8080 \
   -itd --name argocd-server argoproj/argocd:latest
 echo 'ArgoCD installed'
 docker ps | grep argocd
+
+# Install cAdvisor of Google to collect resource usage and performance characteristics of all containers
+# in this instance, even including the Jenkins and ArgoCD.
+# We'll grants this Docker "cAdvisor" container root capabilities to all devices on the host system.
+docker run -d \
+  --name=cadvisor \
+  --volume=/:/rootfs:ro \
+  --volume=/var/run:/var/run:ro \
+  --volume=/sys:/sys:ro \
+  --volume=/var/lib/docker/:/var/lib/docker:ro \
+  --publish=8081:8080 \
+  --detach=true \
+  --privileged \
+  google/cadvisor:latest
+echo 'CAdvisor installed'
+docker ps | grep cadvisor
+
+# [Part 1] Install Node Exporter
+sudo wget https://github.com/prometheus/node_exporter/releases/latest/download/node_exporter-*.linux-amd64.tar.gz
+sudo tar xvfz node_exporter-*.linux-amd64.tar.gz
+cd node_exporter-*.linux-amd64
+sudo mv node_exporter /usr/local/bin/
+
+# [Part 2] Create the systemd service file for Node Exporter
+sudo bash -c "cat <<EOL > /etc/systemd/system/node_exporter.service
+[Unit]
+Description=Node Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=nobody
+ExecStart=/usr/local/bin/node_exporter
+
+[Install]
+WantedBy=default.target
+EOL"
+
+# [Part 3] Start Node Exporter
+sudo systemctl daemon-reload # Reload the systemd daemon
+sudo systemctl start node_exporter # Start the Node Exporter service
+sudo systemctl enable node_exporter # Enable the Node Exporter service to start on boot
+sudo systemctl status node_exporter # Verify that the Node Exporter is running

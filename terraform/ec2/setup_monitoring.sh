@@ -38,16 +38,36 @@ sudo systemctl enable docker
 docker --version
 docker-compose --version
 
-# Install Prometheus by Docker
-cat <<EOL > "prometheus.yml"
+# [Part 1] Prepare Prometheus configs
+sudo bash -c "cat <<EOL > ./prometheus.yml
 global:
   scrape_interval: 15s
 scrape_configs:
   - job_name: 'prometheus'
     static_configs:
       - targets: ['prometheus:9090']
-EOL
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets:
+EOL"
 
+# Add multiple Node Exporter targets (Port: 9100)
+for ip in ${CICD_NODE_EXPORTER_IPS}; do
+  sudo bash -c "echo \"        - '${ip}:9100'\" >> ./prometheus.yml"
+done
+
+# Add multiple cAdvisor targets (Port: 8081)
+sudo bash -c "cat <<EOL >> ./prometheus.yml
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets:
+EOL"
+
+for ip in ${CICD_CADVISOR_IPS}; do
+  sudo bash -c "echo \"        - '${ip}:8081'\" >> ./prometheus.yml"
+done
+
+# [Part 2] Install Prometheus by Docker with the given config above
 docker run -p 9090:9090 \
   -v ./prometheus.yml:/etc/prometheus/prometheus.yml \
   --restart=always \

@@ -8,15 +8,15 @@ aws_instance_config_map = {
 
     # CIDR Ingress Variables
     create_ingress_cidr = true
-    ingress_cidr_from_port = [22, 80, 443, 9090, 3000, 8080, 9080]             # List of from ports
-    ingress_cidr_to_port = [22, 80, 443, 9090, 3000, 8080, 9080]             # List of to ports
-    ingress_cidr_protocol = ["tcp", "tcp", "tcp", "tcp", "tcp", "tcp", "tcp"]
+    ingress_cidr_from_port = [22, 80, 443, 9090, 3000, 8080, 9080, 8081]             # List of from ports
+    ingress_cidr_to_port = [22, 80, 443, 9090, 3000, 8080, 9080, 8081]             # List of to ports
+    ingress_cidr_protocol = ["tcp", "tcp", "tcp", "tcp", "tcp", "tcp", "tcp", "tcp"]
     # Protocol for all rules (you can add more if needed)
     ingress_cidr_block  = [
-      "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0"
+      "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0"
     ]
     ingress_cidr_description = [
-      "SSH", "HTTP", "HTTPS", "Prometheus", "Grafana", "Jenkins", "ArgoCD"
+      "SSH", "HTTP", "HTTPS", "Prometheus", "Grafana", "Jenkins", "ArgoCD", "cAdvisor"
     ]
 
     # CIDR Egress Variables
@@ -29,7 +29,7 @@ aws_instance_config_map = {
   cicd = {
     instance_type  = "t3a.medium"
     instance_count = 1
-    volume_size    = 15
+    volume_size    = 25
     application    = "cicd"
     name           = "cicd"
     prefix         = "quoctran"

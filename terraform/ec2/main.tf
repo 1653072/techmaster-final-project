@@ -29,7 +29,10 @@ resource "aws_instance" "ec2_instance_monitoring" {
   key_name      = var.aws_instance_config_map["common"].key_name
   instance_type = var.aws_instance_config_map["monitoring"].instance_type
   count         = var.aws_instance_config_map["monitoring"].instance_count
-  user_data     = base64encode(file("${path.module}/setup_monitoring.sh"))
+  user_data     = base64encode(templatefile("${path.module}/setup_monitoring.sh", {
+    CICD_NODE_EXPORTER_IPS = join(" ", aws_instance.ec2_instance_cicd[*].public_ip),
+    CICD_CADVISOR_IPS      = join(" ", aws_instance.ec2_instance_cicd[*].public_ip)
+  }))
 
   root_block_device {
     volume_size = var.aws_instance_config_map["monitoring"].volume_size # Size in GB
