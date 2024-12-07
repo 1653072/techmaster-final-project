@@ -3,12 +3,6 @@ variable "security_group_ids" {
   type        = list(string)
 }
 
-# variable "cicd_instance_public_ips" {
-#   description = "List of public IPs of CICD EC2 instances."
-#   type        = list(string)
-#   default     = []
-# }
-
 variable "tags" {
   default     = {}
   type        = map(string)

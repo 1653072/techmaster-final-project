@@ -32,7 +32,6 @@ module "ec2_monitoring" {
   name               = var.aws_instance_config_map["monitoring"].name
   prefix             = var.aws_instance_config_map["monitoring"].prefix
   security_group_ids = module.security_group_monitoring.monitoring_security_group_ids
-  #   cicd_instance_public_ips = module.ec2_cicd.cicd_instance_public_ips
 }
 
 module "ec2_kubernetes" {
