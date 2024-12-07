@@ -11,15 +11,30 @@
       one node now.
 
 2. **Commands**:
-    ```
-    cd terraform
-    terraform validate
-    terraform init
-    terraform plan --var-file=./terraform.tfvars
-    terraform apply --var-file=./terraform.tfvars
-    terraform destroy --var-file=./terraform.tfvars
-    ```
+   ```
+   cd terraform
+   
+   // Format all Terraform files.
+   terraform fmt -recursive
+   
+   // Initialize Terraform requirements and prerequisites.
+   terraform init
+   
+   // Validate Terraform logic.
+   terraform validate
+   
+   // Show all expected Terraform changes.
+   terraform plan --var-file=./terraform.tfvars 
+   
+   // Official apply all Terraform changes.
+   terraform apply --var-file=./terraform.tfvars 
+   
+   // Destroy all Terraform resources (EC2, SecurityGroup, etc).
+   // We should run this command at the last stage of development to delete all resources.
+   terraform destroy --var-file=./terraform.tfvars 
+   ```
 
 ## Setup 2: Github & Docker Registry
 
+- To be defined later.
 

@@ -10,11 +10,12 @@ module "ec2_cicd" {
   instance_type      = var.aws_instance_config_map["cicd"].instance_type
   instance_count     = var.aws_instance_config_map["cicd"].instance_count
   volume_size        = var.aws_instance_config_map["cicd"].volume_size
+  volume_type        = var.aws_instance_config_map["cicd"].volume_type
   environment        = var.aws_instance_config_map["cicd"].environment
   application        = var.aws_instance_config_map["cicd"].application
   name               = var.aws_instance_config_map["cicd"].name
   prefix             = var.aws_instance_config_map["cicd"].prefix
-  security_group_ids = module.security_group_cicd.security_group_ids
+  security_group_ids = module.security_group_cicd.cicd_security_group_ids
 }
 
 module "ec2_monitoring" {
@@ -25,11 +26,13 @@ module "ec2_monitoring" {
   instance_type      = var.aws_instance_config_map["monitoring"].instance_type
   instance_count     = var.aws_instance_config_map["monitoring"].instance_count
   volume_size        = var.aws_instance_config_map["monitoring"].volume_size
+  volume_type        = var.aws_instance_config_map["monitoring"].volume_type
   environment        = var.aws_instance_config_map["monitoring"].environment
   application        = var.aws_instance_config_map["monitoring"].application
   name               = var.aws_instance_config_map["monitoring"].name
   prefix             = var.aws_instance_config_map["monitoring"].prefix
-  security_group_ids = module.security_group_monitoring.security_group_ids
+  security_group_ids = module.security_group_monitoring.monitoring_security_group_ids
+  #   cicd_instance_public_ips = module.ec2_cicd.cicd_instance_public_ips
 }
 
 module "ec2_kubernetes" {
@@ -40,11 +43,12 @@ module "ec2_kubernetes" {
   instance_type      = var.aws_instance_config_map["kubernetes"].instance_type
   instance_count     = var.aws_instance_config_map["kubernetes"].instance_count
   volume_size        = var.aws_instance_config_map["kubernetes"].volume_size
+  volume_type        = var.aws_instance_config_map["kubernetes"].volume_type
   environment        = var.aws_instance_config_map["kubernetes"].environment
   application        = var.aws_instance_config_map["kubernetes"].application
   name               = var.aws_instance_config_map["kubernetes"].name
   prefix             = var.aws_instance_config_map["kubernetes"].prefix
-  security_group_ids = module.security_group_kubernetes.security_group_ids
+  security_group_ids = module.security_group_kubernetes.kubernetes_security_group_ids
 }
 
 module "security_group_cicd" {

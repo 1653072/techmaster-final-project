@@ -53,7 +53,7 @@ EOL"
 
 # Add multiple Node Exporter targets (Port: 9100)
 for ip in ${CICD_NODE_EXPORTER_IPS}; do
-  sudo bash -c "echo \"        - '${ip}:9100'\" >> ./prometheus.yml"
+  sudo bash -c "echo \"        - '$ip:9100'\" >> ./prometheus.yml"
 done
 
 # Add multiple cAdvisor targets (Port: 8081)
@@ -64,7 +64,7 @@ sudo bash -c "cat <<EOL >> ./prometheus.yml
 EOL"
 
 for ip in ${CICD_CADVISOR_IPS}; do
-  sudo bash -c "echo \"        - '${ip}:8081'\" >> ./prometheus.yml"
+  sudo bash -c "echo \"        - '$ip:8081'\" >> ./prometheus.yml"
 done
 
 # [Part 2] Install Prometheus by Docker with the given config above
