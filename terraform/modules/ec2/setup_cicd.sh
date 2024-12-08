@@ -44,7 +44,7 @@ docker run -p 8080:8080 -p 50000:50000 \
   -v /var/run/docker.sock:/var/run/docker.sock \
   --restart=always \
   -itd --name jenkins-server jenkins:latest
-chmod 666 /var/run/docker.sock
+sudo chmod 666 /var/run/docker.sock
 echo 'Jenkins installed'
 docker ps | grep jenkins-server
 
@@ -73,9 +73,9 @@ echo 'CAdvisor installed'
 docker ps | grep cadvisor
 
 # [Part 1] Install Node Exporter
-sudo wget https://github.com/prometheus/node_exporter/releases/latest/download/node_exporter-*.linux-amd64.tar.gz
-sudo tar xvfz node_exporter-*.linux-amd64.tar.gz
-cd node_exporter-*.linux-amd64
+sudo wget https://github.com/prometheus/node_exporter/releases/latest/download/node_exporter-1.8.2.linux-amd64.tar.gz
+sudo tar xvfz node_exporter-1.8.2.linux-amd64.tar.gz
+cd node_exporter-1.8.2.linux-amd64
 sudo mv node_exporter /usr/local/bin/
 
 # [Part 2] Create the systemd service file for Node Exporter

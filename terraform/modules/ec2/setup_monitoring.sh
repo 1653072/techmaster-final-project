@@ -56,6 +56,10 @@ for ip in ${CICD_NODE_EXPORTER_IPS}; do
   sudo bash -c "echo \"        - '$ip:9100'\" >> ./prometheus.yml"
 done
 
+for ip in ${KUBERNETES_NODE_EXPORTER_IPS}; do
+  sudo bash -c "echo \"        - '$ip:9100'\" >> ./prometheus.yml"
+done
+
 # Add multiple cAdvisor targets (Port: 8081)
 sudo bash -c "cat <<EOL >> ./prometheus.yml
   - job_name: 'cadvisor'

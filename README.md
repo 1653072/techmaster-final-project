@@ -14,6 +14,10 @@
    ```
    cd terraform
    
+   // Export crucial AWS secrets through "Security Credentials - Access Keys" feature.
+   export AWS_ACCESS_KEY_ID=
+   export AWS_SECRET_ACCESS_KEY=
+   
    // Format all Terraform files.
    terraform fmt -recursive
    

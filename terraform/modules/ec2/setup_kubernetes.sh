@@ -51,3 +51,30 @@ sudo chmod +x /etc/profile.d/kubectl_alias.sh
 source /etc/profile.d/kubectl_alias.sh
 sudo kubectl get nodes
 sudo kubectl version
+
+# [Part 1] Install Node Exporter
+sudo wget https://github.com/prometheus/node_exporter/releases/latest/download/node_exporter-1.8.2.linux-amd64.tar.gz
+sudo tar xvfz node_exporter-1.8.2.linux-amd64.tar.gz
+cd node_exporter-1.8.2.linux-amd64
+sudo mv node_exporter /usr/local/bin/
+
+# [Part 2] Create the systemd service file for Node Exporter
+sudo bash -c "cat <<EOL > /etc/systemd/system/node_exporter.service
+[Unit]
+Description=Node Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=nobody
+ExecStart=/usr/local/bin/node_exporter
+
+[Install]
+WantedBy=default.target
+EOL"
+
+# [Part 3] Start Node Exporter
+sudo systemctl daemon-reload # Reload the systemd daemon
+sudo systemctl start node_exporter # Start the Node Exporter service
+sudo systemctl enable node_exporter # Enable the Node Exporter service to start on boot
+sudo systemctl status node_exporter # Verify that the Node Exporter is running

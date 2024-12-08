@@ -30,8 +30,9 @@ resource "aws_instance" "ec2_instance_monitoring" {
   instance_type = var.instance_type
   count         = var.instance_count
   user_data = base64encode(templatefile("${path.module}/setup_monitoring.sh", {
-    CICD_NODE_EXPORTER_IPS = join(" ", aws_instance.ec2_instance_cicd[*].public_ip),
-    CICD_CADVISOR_IPS      = join(" ", aws_instance.ec2_instance_cicd[*].public_ip),
+    CICD_NODE_EXPORTER_IPS       = join(" ", aws_instance.ec2_instance_cicd[*].public_ip),
+    CICD_CADVISOR_IPS            = join(" ", aws_instance.ec2_instance_cicd[*].public_ip),
+    KUBERNETES_NODE_EXPORTER_IPS = join(" ", aws_instance.ec2_instance_kubernetes[*].public_ip),
   }))
 
   root_block_device {
