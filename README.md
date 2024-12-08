@@ -48,13 +48,18 @@
 3. **Notes**:
    - 1st EC2 instance for CI/CD services:
      - Jenkins port: **8080**
-     - ArgoCD port: **9080**
      - CAdvisor port: **8081**
+     - Prometheus Node Exporter port: **9100**
+     - ArgoCD Server UI port: **9080**
+     - ArgoCD Metrics port: **9082**
+     - ArgoCD Server Metrics port: **9083**
+     - ArgoCD Repo Server Metrics port: **9084**
    - 2nd EC2 instance for monitoring services:
      - Prometheus port: **9090**
      - Grafana port: **3000**
    - 3rd EC2 instance for K8S services:
-     - Please follow with available K8S ports in next steps.
+     - Prometheus Node Exporter port: **9100**
+     - Please follow with other K8S service ports in next steps.
 
 ## Setup 2: Github & Docker Registry
 

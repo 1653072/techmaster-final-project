@@ -23,15 +23,15 @@ aws_instance_config_map = {
     # CIDR Ingress Variables
     extra_sg_tags          = {}
     create_ingress_cidr    = true
-    ingress_cidr_from_port = [22, 80, 443, 8080, 9080, 8081, 9100] # List of from ports
-    ingress_cidr_to_port   = [22, 80, 443, 8080, 9080, 8081, 9100] # List of to ports
-    ingress_cidr_protocol  = ["tcp", "tcp", "tcp", "tcp", "tcp", "tcp", "tcp", "tcp"]
+    ingress_cidr_from_port = [22, 80, 443, 8080, 8081, 9100, 9080, 9082, 9083, 9084] # List of from ports
+    ingress_cidr_to_port   = [22, 80, 443, 8080, 8081, 9100, 9080, 9082, 9083, 9084] # List of to ports
+    ingress_cidr_protocol  = ["tcp", "tcp", "tcp", "tcp", "tcp", "tcp", "tcp", "tcp", "tcp", "tcp"]
     # Protocol for all rules (you can add more if needed)
     ingress_cidr_block = [
-      "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0"
+      "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0", "0.0.0.0/0"
     ]
     ingress_cidr_description = [
-      "SSH", "HTTP", "HTTPS", "Jenkins", "ArgoCD", "cAdvisor", "Prometheus-Node-Exporter"
+      "SSH", "HTTP", "HTTPS", "Jenkins", "cAdvisor", "Prometheus-Node-Exporter", "ArgoCD-Server", "ArgoCD-Metrics", "ArgoCD-Server-Metrics", "ArgoCD-Repo-Server-Metrics"
     ]
 
     # CIDR Egress Variables

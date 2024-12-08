@@ -53,6 +53,22 @@ sudo kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-
 sudo kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 
 # [Part 2] Create the systemd service file for ArgoCD K8S Port-Forward
+sudo tee /usr/local/bin/argocd_port_forward_script.sh > /dev/null <<EOL
+#!/bin/bash
+
+# Terminate any existing port-forward processes.
+pkill -f 'kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml port-forward'
+
+# Start new port-forward processes, then wait all processes to be available.
+/usr/local/bin/kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml port-forward svc/argocd-server -n argocd 9080:443 --address 0.0.0.0 &
+/usr/local/bin/kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml port-forward svc/argocd-metrics -n argocd 9082:8082 --address 0.0.0.0 &
+/usr/local/bin/kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml port-forward svc/argocd-server-metrics -n argocd 9083:8083 --address 0.0.0.0 &
+/usr/local/bin/kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml port-forward svc/argocd-repo-server -n argocd 9084:8084 --address 0.0.0.0 &
+
+wait
+EOL
+sudo chmod +x /usr/local/bin/argocd_port_forward_script.sh
+
 sudo bash -c "cat <<EOL > /etc/systemd/system/argocd_port_forward.service
 [Unit]
 Description=ArgoCD Port Forward
@@ -61,7 +77,7 @@ After=network-online.target
 
 [Service]
 User=nobody
-ExecStart=/usr/local/bin/kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml port-forward svc/argocd-server -n argocd 9080:443 --address 0.0.0.0
+ExecStart=/usr/local/bin/argocd_port_forward_script.sh
 
 [Install]
 WantedBy=default.target

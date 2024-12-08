@@ -52,11 +52,11 @@ scrape_configs:
 EOL"
 
 # Add multiple Node Exporter targets (Port: 9100)
-for ip in ${CICD_NODE_EXPORTER_IPS}; do
+for ip in ${CICD_INSTANCE_PUBLIC_IPS}; do
   sudo bash -c "echo \"        - '$ip:9100'\" >> ./prometheus.yml"
 done
 
-for ip in ${KUBERNETES_NODE_EXPORTER_IPS}; do
+for ip in ${KUBERNETES_INSTANCE_PUBLIC_IPS}; do
   sudo bash -c "echo \"        - '$ip:9100'\" >> ./prometheus.yml"
 done
 
@@ -67,8 +67,41 @@ sudo bash -c "cat <<EOL >> ./prometheus.yml
       - targets:
 EOL"
 
-for ip in ${CICD_CADVISOR_IPS}; do
+for ip in ${CICD_INSTANCE_PUBLIC_IPS}; do
   sudo bash -c "echo \"        - '$ip:8081'\" >> ./prometheus.yml"
+done
+
+# Add multiple ArgoCD Metrics targets (Port: 9082)
+sudo bash -c "cat <<EOL >> ./prometheus.yml
+  - job_name: 'argocd-metrics'
+    static_configs:
+      - targets:
+EOL"
+
+for ip in ${CICD_INSTANCE_PUBLIC_IPS}; do
+  sudo bash -c "echo \"        - '$ip:9082'\" >> ./prometheus.yml"
+done
+
+# Add multiple ArgoCD Server Metrics targets (Port: 9083)
+sudo bash -c "cat <<EOL >> ./prometheus.yml
+  - job_name: 'argocd-server-metrics'
+    static_configs:
+      - targets:
+EOL"
+
+for ip in ${CICD_INSTANCE_PUBLIC_IPS}; do
+  sudo bash -c "echo \"        - '$ip:9083'\" >> ./prometheus.yml"
+done
+
+# Add multiple ArgoCD Repo Server Metrics targets (Port: 9084)
+sudo bash -c "cat <<EOL >> ./prometheus.yml
+  - job_name: 'argocd-repo-server-metrics'
+    static_configs:
+      - targets:
+EOL"
+
+for ip in ${CICD_INSTANCE_PUBLIC_IPS}; do
+  sudo bash -c "echo \"        - '$ip:9084'\" >> ./prometheus.yml"
 done
 
 # [Part 2] Install Prometheus by Docker with the given config above
