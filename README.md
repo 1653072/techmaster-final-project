@@ -30,8 +30,8 @@
    // Show all expected Terraform changes before oficially applying them.
    terraform plan --var-file=./terraform.tfvars
    
-   // Official apply all Terraform changes.
-   terraform apply --var-file=./terraform.tfvars
+   // Official apply all Terraform changes with the auto approval.
+   terraform apply -auto-approve --var-file=./terraform.tfvars
    
    // If we have made any changes in the real-world infrastructure (e.g directly changing something in AWS EC2 website),
    // then we should use this command to refresh the correct and latest system states. 
