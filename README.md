@@ -27,15 +27,22 @@
    // Validate Terraform logic.
    terraform validate
    
-   // Show all expected Terraform changes.
-   terraform plan --var-file=./terraform.tfvars 
+   // Show all expected Terraform changes before oficially applying them.
+   terraform plan --var-file=./terraform.tfvars
    
    // Official apply all Terraform changes.
-   terraform apply --var-file=./terraform.tfvars 
+   terraform apply --var-file=./terraform.tfvars
    
-   // Destroy all Terraform resources (EC2, SecurityGroup, etc).
+   // If we have made any changes in the real-world infrastructure (e.g directly changing something in AWS EC2 website),
+   // then we should use this command to refresh the correct and latest system states. 
+   terraform refresh --var-file=./terraform.tfvars
+   
+   // Show all expected Terraform changes before oficially destroying them.
+   terraform plan -destroy --var-file=./terraform.tfvars
+   
+   // Destroy all Terraform resources (EC2, SecurityGroup, NetworkInterfaces, etc).
    // We should run this command at the last stage of development to delete all resources.
-   terraform destroy --var-file=./terraform.tfvars 
+   terraform destroy --var-file=./terraform.tfvars
    ```
 
 ## Setup 2: Github & Docker Registry
