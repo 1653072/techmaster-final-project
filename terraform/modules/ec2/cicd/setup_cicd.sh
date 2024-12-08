@@ -49,10 +49,14 @@ sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo kubectl get nodes
 sudo kubectl version
 
-# [ArgoCD] Step 2: Install ArgoCD by K8S & Update the "argocd-server" service type to LoadBalancer
+# [ArgoCD] Step 2:
+# - Install and Run ArgoCD K8S.
+# - Update the "argocd-server" service type to LoadBalancer.
+# - Sleep 70 seconds to ensure all ArgoCD pods are ready before going to next steps.
 sudo kubectl create namespace argocd
 sudo kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 sudo kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+sudo sleep 70s
 
 # [ArgoCD] Step 3: Create the systemd service file for ArgoCD K8S Port-Forward
 # - Format: Host_Port -> K8S_Service_Port
@@ -85,6 +89,8 @@ After=network-online.target
 [Service]
 User=nobody
 ExecStart=/usr/local/bin/argocd_port_forward_script.sh
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=default.target
