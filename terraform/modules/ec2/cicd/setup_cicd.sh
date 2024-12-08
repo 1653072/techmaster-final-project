@@ -60,15 +60,17 @@ sudo docker ps | grep argocd
 # in this instance, even including the Jenkins and ArgoCD.
 # We'll grants this Docker "cAdvisor" container root capabilities to all devices on the host system.
 docker run -itd \
-  --name=cadvisor \
+  --name=cadvisor-server \
   --volume=/:/rootfs:ro \
   --volume=/var/run:/var/run:ro \
   --volume=/sys:/sys:ro \
   --volume=/var/lib/docker/:/var/lib/docker:ro \
+  --volume=/dev/disk/:/dev/disk:ro \
   --publish=8081:8080 \
   --detach=true \
   --privileged \
-  google/cadvisor:latest
+  --device=/dev/kmsg \
+  gcr.io/cadvisor/cadvisor:latest
 echo 'CAdvisor installed'
 sudo docker ps | grep cadvisor
 
