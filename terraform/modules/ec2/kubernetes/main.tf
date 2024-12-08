@@ -5,6 +5,12 @@ resource "aws_instance" "ec2_instance_kubernetes" {
   count         = var.instance_count
   user_data     = base64encode(file("${path.module}/setup_kubernetes.sh"))
 
+  timeouts {
+    create = "20m"
+    update = "20m"
+    delete = "20m"
+  }
+
   root_block_device {
     volume_size = var.volume_size
     volume_type = var.volume_type

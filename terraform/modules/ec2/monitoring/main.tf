@@ -8,6 +8,12 @@ resource "aws_instance" "ec2_instance_monitoring" {
     KUBERNETES_INSTANCE_PUBLIC_IPS = join(" ", var.kubernetes_instance_public_ips),
   }))
 
+  timeouts {
+    create = "20m"
+    update = "20m"
+    delete = "20m"
+  }
+
   root_block_device {
     volume_size = var.volume_size
     volume_type = var.volume_type

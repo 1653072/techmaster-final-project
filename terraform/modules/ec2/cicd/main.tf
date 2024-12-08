@@ -7,6 +7,12 @@ resource "aws_instance" "ec2_instance_cicd" {
     INITIAL_ARGOCD_ADMIN_PASSWORD = var.initial_argocd_admin_password,
   }))
 
+  timeouts {
+    create = "20m"
+    update = "20m"
+    delete = "20m"
+  }
+
   root_block_device {
     volume_size = var.volume_size
     volume_type = var.volume_type
