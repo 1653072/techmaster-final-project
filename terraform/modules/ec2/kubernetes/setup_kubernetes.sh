@@ -53,13 +53,13 @@ sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo kubectl get nodes
 sudo kubectl version
 
-# [Part 1] Install Node Exporter
+# [NodeExporter] Step 1: Installation
 sudo wget https://github.com/prometheus/node_exporter/releases/latest/download/node_exporter-1.8.2.linux-amd64.tar.gz
 sudo tar xvfz node_exporter-1.8.2.linux-amd64.tar.gz
 cd node_exporter-1.8.2.linux-amd64
 sudo mv node_exporter /usr/local/bin/
 
-# [Part 2] Create the systemd service file for Node Exporter
+# [NodeExporter] Step 2: Create the systemd service file for Node Exporter
 sudo bash -c "cat <<EOL > /etc/systemd/system/node_exporter.service
 [Unit]
 Description=Node Exporter
@@ -74,7 +74,7 @@ ExecStart=/usr/local/bin/node_exporter
 WantedBy=default.target
 EOL"
 
-# [Part 3] Start Node Exporter
+# [NodeExporter] Step 3: Start Node Exporter through the systemd service
 sudo systemctl daemon-reload # Reload the systemd daemon
 sudo systemctl start node_exporter # Start the service
 sudo systemctl enable node_exporter # Enable the service to start on boot

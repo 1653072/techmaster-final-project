@@ -38,7 +38,9 @@ sudo systemctl enable docker
 docker --version
 docker-compose --version
 
-# Install K8S by using the K3S & Update mod for the "k3s.yaml" file to allow "user=nobody" in systemd to read it
+# [ArgoCD] Step 1:
+# - Install K8S by using the K3S.
+# - Update mod for the "k3s.yaml" file to allow "user=nobody" in systemd to read it.
 sudo curl -sfL https://get.k3s.io | sh -
 sudo bash -c 'echo "alias kubectl=\"kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml\"" > /etc/profile.d/kubectl_alias.sh'
 sudo chmod +x /etc/profile.d/kubectl_alias.sh
@@ -47,12 +49,17 @@ sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo kubectl get nodes
 sudo kubectl version
 
-# [Part 1] Install ArgoCD by Kubernetes with UI & Update the "argocd-server" service type to LoadBalancer
+# [ArgoCD] Step 2: Install ArgoCD by K8S & Update the "argocd-server" service type to LoadBalancer
 sudo kubectl create namespace argocd
 sudo kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 sudo kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 
-# [Part 2] Create the systemd service file for ArgoCD K8S Port-Forward
+# [ArgoCD] Step 3: Create the systemd service file for ArgoCD K8S Port-Forward
+# - Format: Host_Port -> K8S_Service_Port
+# - argocd-server (UI website & APIs): 9080 -> 443
+# - argocd-metrics (Overall metrics): 9082 -> 8082
+# - argocd-server-metrics (Server metrics) 9083 -> 8083
+# - argocd-repo-server (Repo server metrics): 9084 -> 8084
 sudo tee /usr/local/bin/argocd_port_forward_script.sh > /dev/null <<EOL
 #!/bin/bash
 
@@ -83,19 +90,19 @@ ExecStart=/usr/local/bin/argocd_port_forward_script.sh
 WantedBy=default.target
 EOL"
 
-# [Part 3] Start ArgoCD K8S Port-Forward
+# [ArgoCD] Step 4: Start ArgoCD K8S Port-Forward through the systemd service
 sudo systemctl daemon-reload # Reload the systemd daemon
 sudo systemctl start argocd_port_forward # Start the service
 sudo systemctl enable argocd_port_forward # Enable the service to start on boot
 sudo systemctl status argocd_port_forward # Verify that the service is running
 
-# [Part 4] Install ArgoCD CLI
+# [ArgoCD] Step 5: Install ArgoCD CLI
 export VERSION=$(curl -L -s https://raw.githubusercontent.com/argoproj/argo-cd/stable/VERSION)
 sudo curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/download/v$VERSION/argocd-linux-amd64
 sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
 sudo rm argocd-linux-amd64
 
-# [Part 5] Automatically change the default ArgoCD Admin password to the initial given password through the "argocd-server" service
+# [ArgoCD] Step 6: Automatically change the default ArgoCD Admin password to the initial given password through the "argocd-server" service
 export DEFAULT_ARGOCD_ADMIN_PASSWORD=$(sudo kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
 sudo argocd login localhost:9080 --username admin --password $DEFAULT_ARGOCD_ADMIN_PASSWORD --insecure && sudo argocd account update-password \
   --account admin \
@@ -133,13 +140,13 @@ docker run -itd \
 echo 'CAdvisor installed'
 sudo docker ps | grep cadvisor
 
-# [Part 1] Install Node Exporter
+# [NodeExporter] Step 1: Installation
 sudo wget https://github.com/prometheus/node_exporter/releases/latest/download/node_exporter-1.8.2.linux-amd64.tar.gz
 sudo tar xvfz node_exporter-1.8.2.linux-amd64.tar.gz
 cd node_exporter-1.8.2.linux-amd64
 sudo mv node_exporter /usr/local/bin/
 
-# [Part 2] Create the systemd service file for Node Exporter
+# [NodeExporter] Step 2: Create the systemd service file for Node Exporter
 sudo bash -c "cat <<EOL > /etc/systemd/system/node_exporter.service
 [Unit]
 Description=Node Exporter
@@ -154,7 +161,7 @@ ExecStart=/usr/local/bin/node_exporter
 WantedBy=default.target
 EOL"
 
-# [Part 3] Start Node Exporter
+# [NodeExporter] Step 3: Start Node Exporter through the systemd service
 sudo systemctl daemon-reload # Reload the systemd daemon
 sudo systemctl start node_exporter # Start the service
 sudo systemctl enable node_exporter # Enable the service to start on boot
