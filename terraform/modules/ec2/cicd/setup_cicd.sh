@@ -43,10 +43,10 @@ docker run -p 8080:8080 -p 50000:50000 \
   -v jenkins_server:/var/jenkins_home \
   -v /var/run/docker.sock:/var/run/docker.sock \
   --restart=always \
-  -itd --name jenkins-server jenkins:latest
+  -itd --name jenkins-server jenkins/jenkins:latest
 sudo chmod 666 /var/run/docker.sock
 echo 'Jenkins installed'
-docker ps | grep jenkins-server
+sudo docker ps | grep jenkins-server
 
 # Install ArgoCD by Docker
 docker run -p 9080:8080 \
@@ -54,12 +54,12 @@ docker run -p 9080:8080 \
   --restart=always \
   -itd --name argocd-server argoproj/argocd:latest
 echo 'ArgoCD installed'
-docker ps | grep argocd
+sudo docker ps | grep argocd
 
 # Install cAdvisor of Google to collect resource usage and performance characteristics of all containers
 # in this instance, even including the Jenkins and ArgoCD.
 # We'll grants this Docker "cAdvisor" container root capabilities to all devices on the host system.
-docker run -d \
+docker run -itd \
   --name=cadvisor \
   --volume=/:/rootfs:ro \
   --volume=/var/run:/var/run:ro \
@@ -70,7 +70,7 @@ docker run -d \
   --privileged \
   google/cadvisor:latest
 echo 'CAdvisor installed'
-docker ps | grep cadvisor
+sudo docker ps | grep cadvisor
 
 # [Part 1] Install Node Exporter
 sudo wget https://github.com/prometheus/node_exporter/releases/latest/download/node_exporter-1.8.2.linux-amd64.tar.gz

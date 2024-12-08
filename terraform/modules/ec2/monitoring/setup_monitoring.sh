@@ -45,7 +45,7 @@ global:
 scrape_configs:
   - job_name: 'prometheus'
     static_configs:
-      - targets: ['prometheus:9090']
+      - targets: ['localhost:9090']
   - job_name: 'node_exporter'
     static_configs:
       - targets:
@@ -77,11 +77,11 @@ docker run -p 9090:9090 \
   --restart=always \
   -itd --name prometheus-server prom/prometheus:latest
 echo 'Prometheus installed'
-docker ps | grep prometheus
+sudo docker ps | grep prometheus
 
 # Install Grafana by Docker
 docker run -p 3000:3000 \
   --restart=always \
   -itd --name grafana-server grafana/grafana:latest
 echo 'Grafana installed'
-docker ps | grep grafana
+sudo docker ps | grep grafana
