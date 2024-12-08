@@ -18,6 +18,7 @@ aws_instance_config_map = {
     environment    = "all"
 
     # CIDR Ingress Variables
+    extra_sg_tags          = {}
     create_ingress_cidr    = true
     ingress_cidr_from_port = [22, 80, 443, 9090, 3000, 8080, 9080, 8081] # List of from ports
     ingress_cidr_to_port   = [22, 80, 443, 9090, 3000, 8080, 9080, 8081] # List of to ports
@@ -53,6 +54,7 @@ aws_instance_config_map = {
     environment    = "all"
 
     # CIDR Ingress Variables
+    extra_sg_tags          = {}
     create_ingress_cidr    = true
     ingress_cidr_from_port = [22, 80, 443, 9090, 3000, 8080, 9080, 8081] # List of from ports
     ingress_cidr_to_port   = [22, 80, 443, 9090, 3000, 8080, 9080, 8081] # List of to ports
@@ -88,6 +90,7 @@ aws_instance_config_map = {
     environment    = "all"
 
     # CIDR Ingress Variables
+    extra_sg_tags          = {}
     create_ingress_cidr    = true
     ingress_cidr_from_port = [22, 80, 443, 9090, 3000, 8080, 9080, 8081] # List of from ports
     ingress_cidr_to_port   = [22, 80, 443, 9090, 3000, 8080, 9080, 8081] # List of to ports

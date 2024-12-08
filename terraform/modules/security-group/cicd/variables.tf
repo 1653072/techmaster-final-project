@@ -3,7 +3,7 @@ variable "region" {
   description = "Region of the security group."
 }
 
-variable "tags" {
+variable "extra_sg_tags" {
   default     = {}
   type        = map(string)
   description = "Extra tags to attach to the EC2 security group resources."

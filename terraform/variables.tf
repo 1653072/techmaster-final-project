@@ -1,9 +1,3 @@
-variable "tags" {
-  default     = {}
-  type        = map(string)
-  description = "Extra tags to attach to the security group resources"
-}
-
 variable "default_region" {
   type        = string
   description = "Default AWS region"
@@ -24,6 +18,7 @@ variable "aws_instance_config_map" {
     prefix         = string
     environment    = string
 
+    extra_sg_tags            = map(string)
     create_ingress_cidr      = bool
     ingress_cidr_from_port   = list(number)
     ingress_cidr_to_port     = list(number)
