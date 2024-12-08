@@ -79,7 +79,7 @@ sudo curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/release
 sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
 sudo rm argocd-linux-amd64
 
-# [Part 5] Automatically change the default ArgoCD Admin password to the initial given password
+# [Part 5] Automatically change the default ArgoCD Admin password to the initial given password through the "argocd-server" service
 export DEFAULT_ARGOCD_ADMIN_PASSWORD=$(sudo kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
 sudo argocd login localhost:9080 --username admin --password $DEFAULT_ARGOCD_ADMIN_PASSWORD --insecure && sudo argocd account update-password \
   --account admin \
