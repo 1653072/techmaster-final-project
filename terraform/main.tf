@@ -3,19 +3,20 @@ provider "aws" {
 }
 
 module "ec2_cicd" {
-  source             = "./modules/ec2/cicd"
-  region             = var.aws_instance_config_map["cicd"].region
-  ami_id             = var.aws_instance_config_map["cicd"].ami_id
-  key_name           = var.aws_instance_config_map["cicd"].key_name
-  instance_type      = var.aws_instance_config_map["cicd"].instance_type
-  instance_count     = var.aws_instance_config_map["cicd"].instance_count
-  volume_size        = var.aws_instance_config_map["cicd"].volume_size
-  volume_type        = var.aws_instance_config_map["cicd"].volume_type
-  environment        = var.aws_instance_config_map["cicd"].environment
-  application        = var.aws_instance_config_map["cicd"].application
-  name               = var.aws_instance_config_map["cicd"].name
-  prefix             = var.aws_instance_config_map["cicd"].prefix
-  security_group_ids = module.security_group_cicd.cicd_security_group_ids
+  source                        = "./modules/ec2/cicd"
+  region                        = var.aws_instance_config_map["cicd"].region
+  ami_id                        = var.aws_instance_config_map["cicd"].ami_id
+  key_name                      = var.aws_instance_config_map["cicd"].key_name
+  instance_type                 = var.aws_instance_config_map["cicd"].instance_type
+  instance_count                = var.aws_instance_config_map["cicd"].instance_count
+  volume_size                   = var.aws_instance_config_map["cicd"].volume_size
+  volume_type                   = var.aws_instance_config_map["cicd"].volume_type
+  environment                   = var.aws_instance_config_map["cicd"].environment
+  application                   = var.aws_instance_config_map["cicd"].application
+  name                          = var.aws_instance_config_map["cicd"].name
+  prefix                        = var.aws_instance_config_map["cicd"].prefix
+  security_group_ids            = module.security_group_cicd.cicd_security_group_ids
+  initial_argocd_admin_password = var.initial_argocd_admin_password
 }
 
 module "ec2_monitoring" {

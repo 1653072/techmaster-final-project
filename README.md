@@ -30,7 +30,7 @@
    // Show all expected Terraform changes before oficially applying them.
    terraform plan --var-file=./terraform.tfvars
    
-   // Official apply all Terraform changes with the auto approval.
+   // Official apply all Terraform changes with an auto approval.
    terraform apply -auto-approve --var-file=./terraform.tfvars
    
    // If we have made any changes in the real-world infrastructure (e.g directly changing something in AWS EC2 website),
@@ -44,6 +44,17 @@
    // We should run this command at the last stage of development to delete all resources.
    terraform destroy --var-file=./terraform.tfvars
    ```
+
+3. **Notes**:
+   - 1st EC2 instance for CI/CD services:
+     - Jenkins port: **8080**
+     - ArgoCD port: **9080**
+     - CAdvisor port: **8081**
+   - 2nd EC2 instance for monitoring services:
+     - Prometheus port: **9090**
+     - Grafana port: **3000**
+   - 3rd EC2 instance for K8S services:
+     - Please follow with available K8S ports in next steps.
 
 ## Setup 2: Github & Docker Registry
 

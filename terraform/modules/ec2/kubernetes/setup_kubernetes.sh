@@ -39,16 +39,17 @@ docker --version
 docker-compose --version
 
 # Install K9S terminal UI
-sudo curl -s https://api.github.com/repos/derailed/k9s/releases/latest | grep browser_download_url | grep Linux_x86_64.tar.gz | cut -d '"' -f 4 | wget -qi -
-sudo tar -zxvf k9s_Linux_x86_64.tar.gz
-sudo cp k9s /usr/local/bin/
-sudo k9s -v
+sudo wget https://github.com/derailed/k9s/releases/download/v0.32.7/k9s_linux_amd64.deb
+sudo apt install ./k9s_linux_amd64.deb
+sudo rm k9s_linux_amd64.deb
+sudo k9s info
 
 # Install K8S by using the K3S
 sudo curl -sfL https://get.k3s.io | sh -
 sudo bash -c 'echo "alias kubectl=\"kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml\"" > /etc/profile.d/kubectl_alias.sh'
 sudo chmod +x /etc/profile.d/kubectl_alias.sh
 source /etc/profile.d/kubectl_alias.sh
+sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo kubectl get nodes
 sudo kubectl version
 
@@ -75,6 +76,6 @@ EOL"
 
 # [Part 3] Start Node Exporter
 sudo systemctl daemon-reload # Reload the systemd daemon
-sudo systemctl start node_exporter # Start the Node Exporter service
-sudo systemctl enable node_exporter # Enable the Node Exporter service to start on boot
-sudo systemctl status node_exporter # Verify that the Node Exporter is running
+sudo systemctl start node_exporter # Start the service
+sudo systemctl enable node_exporter # Enable the service to start on boot
+sudo systemctl status node_exporter # Verify that the service is running

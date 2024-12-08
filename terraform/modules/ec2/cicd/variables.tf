@@ -3,6 +3,11 @@ variable "security_group_ids" {
   type        = list(string)
 }
 
+variable "initial_argocd_admin_password" {
+  type        = string
+  description = "Initial ArgoCD Admin password"
+}
+
 variable "tags" {
   default     = {}
   type        = map(string)

@@ -1,6 +1,9 @@
 // Default AWS region
 default_region = "ap-southeast-1"
 
+// Initial ArgoCD admin password
+initial_argocd_admin_password = "admin@123"
+
 # EC2 Variables & Tags
 aws_instance_config_map = {
   cicd = {

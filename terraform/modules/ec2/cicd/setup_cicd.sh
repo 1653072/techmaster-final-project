@@ -38,6 +38,56 @@ sudo systemctl enable docker
 docker --version
 docker-compose --version
 
+# Install K8S by using the K3S & Update mod for the "k3s.yaml" file to allow "user=nobody" in systemd to read it
+sudo curl -sfL https://get.k3s.io | sh -
+sudo bash -c 'echo "alias kubectl=\"kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml\"" > /etc/profile.d/kubectl_alias.sh'
+sudo chmod +x /etc/profile.d/kubectl_alias.sh
+source /etc/profile.d/kubectl_alias.sh
+sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+sudo kubectl get nodes
+sudo kubectl version
+
+# [Part 1] Install ArgoCD by Kubernetes with UI & Update the "argocd-server" service type to LoadBalancer
+sudo kubectl create namespace argocd
+sudo kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+sudo kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+
+# [Part 2] Create the systemd service file for ArgoCD K8S Port-Forward
+sudo bash -c "cat <<EOL > /etc/systemd/system/argocd_port_forward.service
+[Unit]
+Description=ArgoCD Port Forward
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=nobody
+ExecStart=/usr/local/bin/kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml port-forward svc/argocd-server -n argocd 9080:443 --address 0.0.0.0
+
+[Install]
+WantedBy=default.target
+EOL"
+
+# [Part 3] Start ArgoCD K8S Port-Forward
+sudo systemctl daemon-reload # Reload the systemd daemon
+sudo systemctl start argocd_port_forward # Start the service
+sudo systemctl enable argocd_port_forward # Enable the service to start on boot
+sudo systemctl status argocd_port_forward # Verify that the service is running
+
+# [Part 4] Install ArgoCD CLI
+export VERSION=$(curl -L -s https://raw.githubusercontent.com/argoproj/argo-cd/stable/VERSION)
+sudo curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/download/v$VERSION/argocd-linux-amd64
+sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+sudo rm argocd-linux-amd64
+
+# [Part 5] Automatically change the default ArgoCD Admin password to the initial given password
+export DEFAULT_ARGOCD_ADMIN_PASSWORD=$(sudo kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+sudo argocd login localhost:9080 --username admin --password $DEFAULT_ARGOCD_ADMIN_PASSWORD --insecure && sudo argocd account update-password \
+  --account admin \
+  --current-password $DEFAULT_ARGOCD_ADMIN_PASSWORD \
+  --new-password $INITIAL_ARGOCD_ADMIN_PASSWORD \
+  --server localhost:9080 \
+  --insecure
+
 # Install Jenkins by Docker
 docker run -p 8080:8080 -p 50000:50000 \
   -v jenkins_server:/var/jenkins_home \
@@ -47,14 +97,6 @@ docker run -p 8080:8080 -p 50000:50000 \
 sudo chmod 666 /var/run/docker.sock
 echo 'Jenkins installed'
 sudo docker ps | grep jenkins-server
-
-# Install ArgoCD by Docker
-docker run -p 9080:8080 \
-  -e ARGOCD_SERVER_INSECURE=true \
-  --restart=always \
-  -itd --name argocd-server argoproj/argocd:latest
-echo 'ArgoCD installed'
-sudo docker ps | grep argocd
 
 # Install cAdvisor of Google to collect resource usage and performance characteristics of all containers
 # in this instance, even including the Jenkins and ArgoCD.
@@ -70,6 +112,7 @@ docker run -itd \
   --detach=true \
   --privileged \
   --device=/dev/kmsg \
+  --restart=always \
   gcr.io/cadvisor/cadvisor:latest
 echo 'CAdvisor installed'
 sudo docker ps | grep cadvisor
@@ -97,6 +140,6 @@ EOL"
 
 # [Part 3] Start Node Exporter
 sudo systemctl daemon-reload # Reload the systemd daemon
-sudo systemctl start node_exporter # Start the Node Exporter service
-sudo systemctl enable node_exporter # Enable the Node Exporter service to start on boot
-sudo systemctl status node_exporter # Verify that the Node Exporter is running
+sudo systemctl start node_exporter # Start the service
+sudo systemctl enable node_exporter # Enable the service to start on boot
+sudo systemctl status node_exporter # Verify that the service is running

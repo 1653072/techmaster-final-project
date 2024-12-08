@@ -3,6 +3,11 @@ variable "default_region" {
   description = "Default AWS region"
 }
 
+variable "initial_argocd_admin_password" {
+  type        = string
+  description = "Initial ArgoCD Admin password"
+}
+
 variable "aws_instance_config_map" {
   description = "Configuration map for AWS instances"
   type = map(object({

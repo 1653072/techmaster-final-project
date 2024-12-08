@@ -3,7 +3,9 @@ resource "aws_instance" "ec2_instance_cicd" {
   key_name      = var.key_name
   instance_type = var.instance_type
   count         = var.instance_count
-  user_data     = base64encode(file("${path.module}/setup_cicd.sh"))
+  user_data = base64encode(templatefile("${path.module}/setup_cicd.sh", {
+    INITIAL_ARGOCD_ADMIN_PASSWORD = var.initial_argocd_admin_password,
+  }))
 
   root_block_device {
     volume_size = var.volume_size
