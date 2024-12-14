@@ -44,14 +44,16 @@ sudo apt install ./k9s_linux_amd64.deb
 sudo rm k9s_linux_amd64.deb
 sudo k9s info
 
-# Install K8S by using the K3S
+# Install K8S by using the K3S & Create 2 main namespaces (i.e "dev" and "prd")
 sudo curl -sfL https://get.k3s.io | sh -
 sudo bash -c 'echo "alias kubectl=\"kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml\"" > /etc/profile.d/kubectl_alias.sh'
 sudo chmod +x /etc/profile.d/kubectl_alias.sh
 source /etc/profile.d/kubectl_alias.sh
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-sudo kubectl get nodes
 sudo kubectl version
+sudo kubectl create namespace dev
+sudo kubectl create namespace prd
+sudo kubectl get nodes --all-namespaces
 
 # [NodeExporter] Step 1: Installation
 sudo wget https://github.com/prometheus/node_exporter/releases/latest/download/node_exporter-1.8.2.linux-amd64.tar.gz

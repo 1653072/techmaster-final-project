@@ -8,7 +8,8 @@
     - 2nd instance: Monitoring instance for Prometheus and Grafana which consumes metrics from the 1st instance and
       visualize those metrics through dashboards.
     - 3rd instance: Kubernetes instance for running pods, deployments, or applications. Our K8S cluster will have only
-      one node now.
+      one node now. In this instance, the Terraform K8S script also creates 2 new namespaces for us, including `dev`
+      and `prd`.
 
 2. **Commands**:
    ```
@@ -123,10 +124,23 @@
         - Kind: Secret text
         - ID: DOCKER_REGISTRY_PASSWORD
         - Secret: <docker_hub_account_password>
-    3. GitHub Personal Access Token:
+    3. GitHub Username:
+        - Kind: Secret text
+        - ID: GITHUB_USERNAME
+        - Secret: 1653072
+    4. GitHub Personal Access Token:
         - Kind: Username with password
+        - ID: GITHUB_PERSONAL_ACCESS_TOKEN 
         - Username: Kienquoctran08@gmail.com or 1653072
-        - Password: <personal_access_token>
+        - Password: <personal_access_token> 
+    5. Final Project K8S Manifest Repository URL:
+        - Kind: Secret text
+        - ID: FINAL_PROJECT_MANIFEST_REPO_URL
+        - Secret: https://github.com/1653072/techmaster-final-project-obo-manifest.git
+    6. Final Project K8S Manifest Repository Name:
+        - Kind: Secret text
+        - ID: FINAL_PROJECT_MANIFEST_REPO_NAME
+        - Secret: techmaster-final-project-obo-manifest
     ```
 
 ## Setup 3: Jenkins Multibranch Pipeline
