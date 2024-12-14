@@ -45,23 +45,99 @@
    terraform destroy --var-file=./terraform.tfvars
    ```
 
-3. **Notes**:
-   - 1st EC2 instance for CI/CD services:
-     - Jenkins port: **8080**
-     - CAdvisor port: **8081**
-     - Prometheus Node Exporter port: **9100**
-     - ArgoCD Server UI port: **9080**
-     - ArgoCD Metrics port: **9082**
-     - ArgoCD Server Metrics port: **9083**
-     - ArgoCD Repo Server Metrics port: **9084**
-   - 2nd EC2 instance for monitoring services:
-     - Prometheus port: **9090**
-     - Grafana port: **3000**
-   - 3rd EC2 instance for K8S services:
-     - Prometheus Node Exporter port: **9100**
-     - Please follow with other K8S service ports in next steps.
+3. **Public ports**:
+    - 1st EC2 instance for CI/CD services:
+        - Jenkins port: **8080**
+        - CAdvisor port: **8081**
+        - Prometheus Node Exporter port: **9100**
+        - ArgoCD Server UI port: **9080**
+        - ArgoCD Metrics port: **9082**
+        - ArgoCD Server Metrics port: **9083**
+        - ArgoCD Repo Server Metrics port: **9084**
+    - 2nd EC2 instance for monitoring services:
+        - Prometheus port: **9090**
+        - Grafana port: **3000**
+    - 3rd EC2 instance for K8S services:
+        - Prometheus Node Exporter port: **9100**
+        - Please follow with other K8S service ports in next steps.
 
-## Setup 2: Github & Docker Registry
+## Setup 2: Docker Hub Registry, GitHub & Jenkins Configurations
 
-- To be defined later.
+1. **Docker Registry**:
+    - Our applications will produce a new Docker Container Image for every code change. Therefore, we should prepare a
+      new [Docker Hub Registry](https://hub.docker.com/) account to store these images in distinct tag versions.
+    - In this final project, we can deploy new images and repositories to the Docker Hub with the public visibility.
+      However, for enterprise projects, we should have our own private place to store these ones.
+    - Here is my Docker Hub account for the final project:
+    ```
+    DOCKER_REGISTRY_USERNAME=quoctran08
+    DOCKER_REGISTRY_PASSWORD=<docker_hub_account_password>
+    ```
+
+2. **GitHub Repositories & Configurations**:
+    - Repositories:
+        - Source code repository: ...TBD...
+        - K8S manifest repository: ...TBD...
+    - Configurations:
+        - Inside the source code repository, we need to enable GitHub Webhook for our Jenkins.
+          ```
+          Instruction: Source code repository -> Settings -> Webhooks
+          Payload URL: https://<jenkins_server>/github-webhook/
+          Content type: application/json
+          SSL verification: Disable
+          Events: Just the push event
+          ```
+        - We need to record the GitHub username for Jenkins access permission. Here is my GitHub username for the final
+          project:
+          ```
+          GITHUB_USERNAME=1653072
+          ```
+        - In GitHub settings, we also need to generate a new personal access token for Jenkins access permission.
+          ```
+          Instruction: 
+          - Access this URL: https://github.com/settings/tokens/new
+          - Add this note "Techmaster|DevOps|Jenkins|FinalProject". 
+          - Change Expiration to "No expiration".
+          - In the scopes section, we will select the whole "repo" scope and the "user:email" field in the "user" scope.
+          ```
+
+3. **Jenkins Plugins**: We should install these necessary Jenkins plugins to easily support our in system operation.
+    ```
+    Instruction: Jenkins Dashboard -> Manage Jenkins -> Manage Plugins -> Available tab.
+    Plugins:
+    1. Blue Ocean: Have a better visualization of pipelines, builds and deployments.
+    2. Pipeline Utility Steps: Provide utility steps for pipeline jobs.
+    3. Kubernetes CLI: Integrate K8S CLI with necessary commands to Jenkins.
+    ```
+
+4. **Jenkins Credentials**: We need to add crucial credentials to Jenkins, which helps it have ability to deploy new
+   images to Docker Hub and new changes to GitHub.
+    ```
+    Instruction: Jenkins Dashboard -> Manage Jenkins -> Manage Credentials -> Global (or create a new folder) -> Add Credentials
+    Crucial credentials:
+    1. Docker Registry Username:
+        - Kind: Secret text
+        - ID: DOCKER_REGISTRY_USERNAME
+        - Secret: quoctran08
+    2. Docker Registry Password:
+        - Kind: Secret text
+        - ID: DOCKER_REGISTRY_PASSWORD
+        - Secret: <docker_hub_account_password>
+    3. GitHub Personal Access Token:
+        - Kind: Username with password
+        - Username: Kienquoctran08@gmail.com or 1653072
+        - Password: <personal_access_token>
+    ```
+
+## Setup 3: Jenkins Multibranch Pipeline
+
+- TBD
+
+## Setup 4: ArgoCD
+
+- TBD
+
+## Setup 5: Prometheus & Grafana
+
+- TBD
 
