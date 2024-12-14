@@ -77,8 +77,8 @@
 
 2. **GitHub Repositories & Configurations**:
     - Repositories:
-        - Source code repository: ...TBD...
-        - K8S manifest repository: ...TBD...
+        - Source code repository: https://github.com/1653072/techmaster-final-project-obo
+        - K8S manifest repository: https://github.com/1653072/techmaster-final-project-obo-manifest
     - Configurations:
         - Inside the source code repository, we need to enable GitHub Webhook for our Jenkins.
           ```
