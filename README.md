@@ -131,7 +131,7 @@
     4. GitHub Personal Access Token:
         - Kind: Username with password
         - ID: GITHUB_PERSONAL_ACCESS_TOKEN 
-        - Username: Kienquoctran08@gmail.com or 1653072
+        - Username: 1653072
         - Password: <personal_access_token> 
     5. Final Project K8S Manifest Repository URL:
         - Kind: Secret text
