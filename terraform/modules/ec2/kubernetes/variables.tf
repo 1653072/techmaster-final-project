@@ -1,3 +1,13 @@
+variable "cicd_instance_public_ips" {
+  description = "List of public IPs of CICD instances"
+  type        = list(string)
+}
+
+variable "initial_argocd_admin_password" {
+  type        = string
+  description = "Initial ArgoCD Admin password"
+}
+
 variable "security_group_ids" {
   description = "List of security group IDs to attach to the EC2 instance."
   type        = list(string)

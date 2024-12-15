@@ -78,26 +78,26 @@
 2. **GitHub Repositories & Configurations**:
     - Repositories:
         - Source code repository: https://github.com/1653072/techmaster-final-project-obo
+            - We should clone the master branch to 2 new branches to help Jenkins work properly, including: `develop`
+              and `release`.
         - K8S manifest repository: https://github.com/1653072/techmaster-final-project-obo-manifest
+            - We should clone the master branch to 2 new branches to help ArgoCD create new applications properly,
+              including: `develop` and `release`.
     - Configurations:
         - Inside the source code repository, we need to enable GitHub Webhook for our Jenkins.
           ```
           Instruction: Source code repository -> Settings -> Webhooks
-          Payload URL: https://<jenkins_server>/github-webhook/
+          Payload URL: http://<jenkins_server>:8080/github-webhook/
           Content type: application/json
           SSL verification: Disable
           Events: Just the push event
           ```
-        - We need to record the GitHub username for Jenkins access permission. Here is my GitHub username for the final
-          project:
-          ```
-          GITHUB_USERNAME=1653072
-          ```
-        - In GitHub settings, we also need to generate a new personal access token for Jenkins access permission.
+        - In GitHub settings, we also need to generate a new personal access token for Jenkins access permission. This
+          token will be used in the next step, so just keep it now.
           ```
           Instruction: 
           - Access this URL: https://github.com/settings/tokens/new
-          - Add this note "Techmaster|DevOps|Jenkins|FinalProject". 
+          - Add this note "Techmaster|DevOps|FinalProject|Jenkins". 
           - Change Expiration to "No expiration".
           - In the scopes section, we will select the whole "repo" scope and the "user:email" field in the "user" scope.
           ```
@@ -124,32 +124,57 @@
         - Kind: Secret text
         - ID: DOCKER_REGISTRY_PASSWORD
         - Secret: <docker_hub_account_password>
-    3. GitHub Username:
-        - Kind: Secret text
-        - ID: GITHUB_USERNAME
-        - Secret: 1653072
-    4. GitHub Personal Access Token:
+    3. GitHub Personal Access Token:
         - Kind: Username with password
         - ID: GITHUB_PERSONAL_ACCESS_TOKEN 
         - Username: 1653072
-        - Password: <personal_access_token> 
-    5. Final Project K8S Manifest Repository URL:
+        - Password: <github_personal_access_token> (You generated this token in the previous step: "Techmaster|DevOps|FinalProject|Jenkins")
+    4. Final Project K8S Manifest Repository URL:
         - Kind: Secret text
         - ID: FINAL_PROJECT_MANIFEST_REPO_URL
         - Secret: https://github.com/1653072/techmaster-final-project-obo-manifest.git
-    6. Final Project K8S Manifest Repository Name:
+    5. Final Project K8S Manifest Repository Name:
         - Kind: Secret text
         - ID: FINAL_PROJECT_MANIFEST_REPO_NAME
         - Secret: techmaster-final-project-obo-manifest
     ```
 
+5. **CICD Instance & GitHub connection**: To help CICD instance, especially ArgoCD, has essential permissions to access
+   our GitHub to pull and push code changes, we need to establish a new SSH key pair here.
+   ```
+   Instruction:
+   1. Access the CICD instance through AWS Connect Console.
+   2. Generate a new SSH key pair inside this CICD instance:
+   -> $ ssh-keygen (Then, just keep moving next steps)
+   3. Print and save both public and private generated keys:
+   -> $ cat ~/.ssh/<key_file_name> (This private key will be used to configurate the ArgoCD Repositories later, just keep it now)
+   -> $ cat ~/.ssh/<key_file_name>.pub (This public key will be used to configurate the GitHub SSH Keys in the next step)
+   4. Access the GitHub and add the new SSH key:
+   -> URL: https://github.com/settings/ssh/new
+   -> Title: "Techmaster|DevOps|FinalProject|CICD"
+   -> Key Type: Authentication Key
+   -> Key: <put_cicd_instance_public_key_here>
+   ```
+
 ## Setup 3: Jenkins Multibranch Pipeline
 
-- TBD
+- TBD: Setup Multibranch Pipeline + Don't forget to add the build retention days/quantity.
 
 ## Setup 4: ArgoCD
 
-- TBD
+1. **ArgoCD Repository Connection**: We need to connect ArgoCD with our GitHub Repository to help it pull latest code
+   changes.
+   ```
+   Instruction: ArgoCD Dashboard -> Settings -> Repositories -> Connect Repo
+   Inside the Connect Repo page:
+   1. Select the SSH connection method.
+   2. Input this name: "techmaster-final-project-obo-manifest".
+   3. Input the project name: "default".
+   4. Input the repository URL: "git@github.com:1653072/techmaster-final-project-obo-manifest.git".
+   5. Input the SSH private key: <put_cicd_instance_private_key_here>
+   ```
+
+2. TBD
 
 ## Setup 5: Prometheus & Grafana
 

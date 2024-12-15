@@ -3,7 +3,10 @@ resource "aws_instance" "ec2_instance_kubernetes" {
   key_name      = var.key_name
   instance_type = var.instance_type
   count         = var.instance_count
-  user_data     = base64encode(file("${path.module}/setup_kubernetes.sh"))
+  user_data = base64encode(templatefile("${path.module}/setup_kubernetes.sh", {
+    CICD_INSTANCE_PUBLIC_IPS      = join(" ", var.cicd_instance_public_ips),
+    INITIAL_ARGOCD_ADMIN_PASSWORD = var.initial_argocd_admin_password,
+  }))
 
   timeouts {
     create = "20m"

@@ -38,19 +38,21 @@ module "ec2_monitoring" {
 }
 
 module "ec2_kubernetes" {
-  source             = "./modules/ec2/kubernetes"
-  region             = var.aws_instance_config_map["kubernetes"].region
-  ami_id             = var.aws_instance_config_map["kubernetes"].ami_id
-  key_name           = var.aws_instance_config_map["kubernetes"].key_name
-  instance_type      = var.aws_instance_config_map["kubernetes"].instance_type
-  instance_count     = var.aws_instance_config_map["kubernetes"].instance_count
-  volume_size        = var.aws_instance_config_map["kubernetes"].volume_size
-  volume_type        = var.aws_instance_config_map["kubernetes"].volume_type
-  environment        = var.aws_instance_config_map["kubernetes"].environment
-  application        = var.aws_instance_config_map["kubernetes"].application
-  name               = var.aws_instance_config_map["kubernetes"].name
-  prefix             = var.aws_instance_config_map["kubernetes"].prefix
-  security_group_ids = module.security_group_kubernetes.kubernetes_security_group_ids
+  source                        = "./modules/ec2/kubernetes"
+  region                        = var.aws_instance_config_map["kubernetes"].region
+  ami_id                        = var.aws_instance_config_map["kubernetes"].ami_id
+  key_name                      = var.aws_instance_config_map["kubernetes"].key_name
+  instance_type                 = var.aws_instance_config_map["kubernetes"].instance_type
+  instance_count                = var.aws_instance_config_map["kubernetes"].instance_count
+  volume_size                   = var.aws_instance_config_map["kubernetes"].volume_size
+  volume_type                   = var.aws_instance_config_map["kubernetes"].volume_type
+  environment                   = var.aws_instance_config_map["kubernetes"].environment
+  application                   = var.aws_instance_config_map["kubernetes"].application
+  name                          = var.aws_instance_config_map["kubernetes"].name
+  prefix                        = var.aws_instance_config_map["kubernetes"].prefix
+  security_group_ids            = module.security_group_kubernetes.kubernetes_security_group_ids
+  cicd_instance_public_ips      = module.ec2_cicd.cicd_instance_public_ips
+  initial_argocd_admin_password = var.initial_argocd_admin_password
 }
 
 module "security_group_cicd" {

@@ -44,7 +44,7 @@ sudo apt install ./k9s_linux_amd64.deb
 sudo rm k9s_linux_amd64.deb
 sudo k9s info
 
-# Install K8S by using the K3S & Create 2 main namespaces (i.e "dev" and "prd")
+# Install K8S by using the K3S Server & Create 2 main namespaces (i.e "dev" and "prd")
 sudo curl -sfL https://get.k3s.io | sh -
 sudo bash -c 'echo "alias kubectl=\"kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml\"" > /etc/profile.d/kubectl_alias.sh'
 sudo chmod +x /etc/profile.d/kubectl_alias.sh
@@ -54,6 +54,41 @@ sudo kubectl version
 sudo kubectl create namespace dev
 sudo kubectl create namespace prd
 sudo kubectl get nodes --all-namespaces
+
+# Register the current K3S Server Cluster Context to the ArgoCD K8S Cluster in the CICD instance
+# ---
+# Documents:
+# 1. K3S Server Configs: https://docs.k3s.io/cli/server
+# 2. ArgoCD Cluster Configs: https://argo-cd.readthedocs.io/en/latest/user-guide/commands/argocd_cluster_add/
+# ---
+export CURRENT_PUBLIC_IP=$(sudo curl -s http://checkip.amazonaws.com)
+export CURRENT_KUBECONFIG_CONTEXT_NAME="$(sudo kubectl config current-context)"
+# ---
+export CURRENT_KUBECONFIG_PATH="/etc/rancher/k3s/k3s.yaml"
+export CURRENT_KUBECONFIG_PATH_FOR_ARGOCD="/etc/rancher/k3s/k3s_argocd.yaml"
+sudo cp $CURRENT_KUBECONFIG_PATH $CURRENT_KUBECONFIG_PATH_FOR_ARGOCD
+# We need to change the localhost 127.0.0.1:6443 to the <PublicIP>:6443
+sudo sed -i.bak "s|server: https://127.0.0.1:6443|server: https://$CURRENT_PUBLIC_IP:6443|" "$CURRENT_KUBECONFIG_PATH_FOR_ARGOCD"
+# ---
+export CURRENT_K3S_SERVICE_FILE_PATH="/etc/systemd/system/k3s.service"
+# Loop to delete the last line up to 3 times or until reaching the line with "ExecStart"
+for i in {1..3}; do
+  if tail -n 1 "$CURRENT_K3S_SERVICE_FILE_PATH" | grep -q "ExecStart"; then
+    break
+  fi
+  sudo sed -i '$d' "$CURRENT_K3S_SERVICE_FILE_PATH"
+done
+# Rewrite the ExecStart of K3S Server by adding the additional PublicIP through the --tls-san argument.
+sudo sed -i '/ExecStart=/c\ExecStart=/usr/local/bin/k3s server --tls-san '"$CURRENT_PUBLIC_IP" "$CURRENT_K3S_SERVICE_FILE_PATH"
+# Restart the K3S system
+sudo systemctl daemon-reload
+sudo systemctl restart k3s
+# ---
+export ARGOCD_SERVER_PORT="9080"
+for ip in ${CICD_INSTANCE_PUBLIC_IPS}; do
+  # Login to the ArgoCD server with auto approval, then we add the current kubeconfig context to the ArgoCD server with auto approval and the upsert mechanism.
+  sudo argocd login "$ip:$ARGOCD_SERVER_PORT" --username admin --password $INITIAL_ARGOCD_ADMIN_PASSWORD --insecure && sudo argocd cluster add $CURRENT_KUBECONFIG_CONTEXT_NAME --yes --insecure --upsert --kubeconfig $CURRENT_KUBECONFIG_PATH_FOR_ARGOCD
+done
 
 # [NodeExporter] Step 1: Installation
 sudo wget https://github.com/prometheus/node_exporter/releases/latest/download/node_exporter-1.8.2.linux-amd64.tar.gz
