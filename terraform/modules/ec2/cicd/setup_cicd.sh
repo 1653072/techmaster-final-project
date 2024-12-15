@@ -3,11 +3,11 @@
 # Update the package list and upgrade the installed packages
 sudo apt-get update -y
 
-# Add Swap Memory of 4GB
+# Add Swap Memory of 3GB
 sudo swapon --show
 free -h
 df -h
-sudo fallocate -l 4G /swapfile
+sudo fallocate -l 3G /swapfile
 ls -lh /swapfile
 sudo chmod 600 /swapfile
 ls -lh /swapfile
@@ -15,10 +15,10 @@ sudo mkswap /swapfile
 sudo swapon /swapfile
 sudo swapon --show
 free -h
-cat /proc/sys/vm/swappiness
-sudo sysctl vm.swappiness=10
-cat /proc/sys/vm/vfs_cache_pressure
-sudo sysctl vm.vfs_cache_pressure=50
+sudo sh -c 'echo "/swapfile swap swap defaults 0 0" >> /etc/fstab'
+sudo sh -c 'echo "vm.swappiness=10" >> /etc/sysctl.conf'
+sudo sh -c 'echo "vm.vfs_cache_pressure=50" >> /etc/sysctl.conf'
+sudo sysctl -p
 
 # Install essential packages
 sudo apt-get install -y curl net-tools wget unzip tree make
