@@ -35,6 +35,7 @@ module "ec2_monitoring" {
   security_group_ids             = module.security_group_monitoring.monitoring_security_group_ids
   cicd_instance_public_ips       = module.ec2_cicd.cicd_instance_public_ips
   kubernetes_instance_public_ips = module.ec2_kubernetes.kubernetes_instance_public_ips
+  depends_on                     = [module.ec2_cicd, module.ec2_kubernetes]
 }
 
 module "ec2_kubernetes" {
@@ -53,6 +54,7 @@ module "ec2_kubernetes" {
   security_group_ids            = module.security_group_kubernetes.kubernetes_security_group_ids
   cicd_instance_public_ips      = module.ec2_cicd.cicd_instance_public_ips
   initial_argocd_admin_password = var.initial_argocd_admin_password
+  depends_on                    = [module.ec2_cicd]
 }
 
 module "security_group_cicd" {

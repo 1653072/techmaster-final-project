@@ -43,7 +43,7 @@
    
    // Destroy all Terraform resources (EC2, SecurityGroup, NetworkInterfaces, etc).
    // We should run this command at the last stage of development to delete all resources.
-   terraform destroy --var-file=./terraform.tfvars
+   terraform destroy --var-file=./terraform.tfvars -auto-approve
    ```
 
 3. **Public ports**:
