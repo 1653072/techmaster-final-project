@@ -60,7 +60,9 @@
         - Grafana port: **3000**
     - 3rd EC2 instance for K8S services:
         - Prometheus Node Exporter port: **9100**
-        - Please follow with other K8S service ports in next steps.
+        - K8S Kube-API-Server port: **6443**
+        - Obo Service port (Dev): **30000**
+        - Obo Service port (Prd): **30001**
 
 ## Setup 2: Docker Hub Registry, GitHub & Jenkins Configurations
 
