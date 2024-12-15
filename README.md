@@ -8,8 +8,8 @@
     - 2nd instance: Monitoring instance for Prometheus and Grafana which consumes metrics from the 1st instance and
       visualize those metrics through dashboards.
     - 3rd instance: Kubernetes instance for running pods, deployments, or applications. Our K8S cluster will have only
-      one node now. In this instance, the Terraform K8S script also creates 2 new namespaces for us, including `dev`
-      and `prd`.
+      one node now. In this instance, the Terraform K8S script also creates 2 new namespaces for us, including **dev**
+      and **prd**.
 
 2. **Commands**:
    ```
@@ -63,6 +63,8 @@
         - K8S Kube-API-Server port: **6443**
         - Obo Service port (Dev): **30000**
         - Obo Service port (Prd): **30001**
+        - Note that we use the same K8S cluster with different namespaces (i.e. **dev** & **prd**), so the same
+          application within 2 different namespaces must have different ports.
 
 ## Setup 2: Docker Hub Registry, GitHub & Jenkins Configurations
 
@@ -89,7 +91,7 @@
         - Inside the source code repository, we need to enable GitHub Webhook for our Jenkins.
           ```
           Instruction: Source code repository -> Settings -> Webhooks
-          Payload URL: http://<jenkins_server>:8080/github-webhook/
+          Payload URL: http://<jenkins_server_ip>:8080/github-webhook/
           Content type: application/json
           SSL verification: Disable
           Events: Just the push event
@@ -106,7 +108,7 @@
 
 3. **Jenkins Plugins**: We should install these necessary Jenkins plugins to easily support our in system operation.
     ```
-    Instruction: Jenkins Dashboard -> Manage Jenkins -> Manage Plugins -> Available tab.
+    Instruction: http://<jenkins_server_ip>:8080 -> Jenkins Dashboard -> Manage Jenkins -> Manage Plugins -> Available tab.
     Plugins:
     1. Blue Ocean: Have a better visualization of pipelines, builds and deployments.
     2. Pipeline Utility Steps: Provide utility steps for pipeline jobs.
@@ -116,7 +118,7 @@
 4. **Jenkins Credentials**: We need to add crucial credentials to Jenkins, which helps it have ability to deploy new
    images to Docker Hub and new changes to GitHub.
     ```
-    Instruction: Jenkins Dashboard -> Manage Jenkins -> Manage Credentials -> Global (or create a new folder) -> Add Credentials
+    Instruction: http://<jenkins_server_ip>:8080 -> Jenkins Dashboard -> Manage Jenkins -> Manage Credentials -> Global (or create a new folder) -> Add Credentials
     Crucial credentials:
     1. Docker Registry Username:
         - Kind: Secret text
@@ -160,7 +162,33 @@
 
 ## Setup 3: Jenkins Multibranch Pipeline
 
-- TBD: Setup Multibranch Pipeline + Don't forget to add the build retention days/quantity.
+1. We need to create a new **Multibranch Pipeline** in Jenkins with these essential details:
+    - Display name: `techmaster-final-project`
+    - Credentials: Select the `GitHub Personal Access Token` credential which was added in the previous step.
+    - Discover branches - strategy: `Exclude...`
+    - Discover pull requests from origin - strategy: `Merge the pull request with...`
+    - Discover pull requests from forks:
+        - Strategy: `Merge the pull request with...`
+        - Trust: `From users with Admin...`
+    - Click `Add source`, then add the `Discover Tags` and the `Filter by name (with regular expression)` with this
+      value: `(develop|release|^v/\d+(?:).(d+)*)$)`
+    - Select the mode and script path with `Jenkinsfile`.
+    - Finally, we need to select `Discard old items` with `15` days and `10` max of old items.
+
+2. To **see how Jenkins works**, we can add some random or test files to the master branch of the source code
+   repository, then we will merge them to the `develop` and `release` branch.
+    - In the `develop` branch:
+        - Step 1: Jenkins builds a new Docker image version.
+        - Step 2: Jenkins deploys it to the Docker Hub Registry
+        - Step 3: Jenkins re-writes the image tag version in the `develop` branch of the K8S manifest repository.
+        - Step 4 (outside of Jenkins): ArgoCD will automatically sync and deploy these new changes to the `dev`
+          namespace of the kubernetes instance.
+    - In the `release` branch:
+        - Step 1: Jenkins builds a new Docker image version.
+        - Step 2: Jenkins waits for us to input the newly expected tag version for production (e.g. v1.0.0).
+        - Step 3: Jenkins re-writes the given image tag version in the `release` branch of the K8S manifest repository.
+        - Step 4 (outside of Jenkins): ArgoCD will automatically sync and deploy these new changes to the `prd`
+          namespace of the kubernetes instance.
 
 ## Setup 4: ArgoCD
 
@@ -176,7 +204,40 @@
    5. Input the SSH private key: <put_cicd_instance_private_key_here>
    ```
 
-2. TBD
+2. **ArgoCD Applications**:
+   - Instruction to create a new application for the **dev** environment:
+     - Step 1: `http://<argocd_server_ip>:9080` -> `ArgoCD Dashboard` -> `+ New App`.
+     - Step 2: In the general section, fill the application name by `techmaster-final-project-obo-dev`.
+     - Step 3: In the general section, fill the project name by `default`.
+     - Step 4: In the general section, enable `Automatic` sync prolicy with the `Self Heal` mode.
+     - Step 5: In the source section, fill the repository url by `git@github.com:1653072/techmaster-final-project-obo-manifest.git`.
+     - Step 6: In the source section, fill the revision by `develop`.
+     - Step 7: In the source section, fill the path by `templates`.
+     - Step 8: In the destination section, fill the cluster URL by `http://<kubernetes_server_ip>:6443`.
+     - Step 9: In the destination section, fill the namespace by `dev`.
+     - Step 10: Click `Create`.
+   - Instruction to create a new application for the **prd** environment:
+     - Step 1: `http://<argocd_server_ip>:9080` -> `ArgoCD Dashboard` -> `+ New App`.
+     - Step 2: In the general section, fill the application name by `techmaster-final-project-obo-prd`.
+     - Step 3: In the general section, fill the project name by `default`.
+     - Step 4: In the general section, enable `Automatic` sync prolicy with the `Self Heal` mode.
+     - Step 5: In the source section, fill the repository url by `git@github.com:1653072/techmaster-final-project-obo-manifest.git`.
+     - Step 6: In the source section, fill the revision by `release`.
+     - Step 7: In the source section, fill the path by `templates`.
+     - Step 8: In the destination section, fill the cluster URL by `http://<kubernetes_server_ip>:6443`.
+     - Step 9: In the destination section, fill the namespace by `prd`.
+     - Step 10: Click `Create`.
+   - Instruction to create a new **helm** application for testing and changing parameters:
+     - Step 1: `http://<argocd_server_ip>:9080` -> `ArgoCD Dashboard` -> `+ New App`.
+     - Step 2: In the general section, fill the application name by `techmaster-final-project-obo-helm`.
+     - Step 3: In the general section, fill the project name by `default`.
+     - Step 4: In the general section, enable `Automatic` sync prolicy with the `Self Heal` mode.
+     - Step 5: In the source section, fill the repository url by `git@github.com:1653072/techmaster-final-project-obo-manifest.git`.
+     - Step 6: In the source section, fill the revision by `master`.
+     - Step 7: In the source section, fill the path by `helm-templates`.
+     - Step 8: In the destination section, fill the cluster URL by `https://kubernetes.default.svc/`.
+     - Step 9: In the destination section, fill the namespace by `default`.
+     - Step 10: Click `Create`.
 
 ## Setup 5: Prometheus & Grafana
 
