@@ -1,5 +1,24 @@
 # TECHMASTER - FINAL PROJECT
 
+## Table of Content
+
+- [Introduction](#introduction)
+- [Setup 1: AWS EC2 Instances](#setup-1-aws-ec2-instances)
+- [Setup 2: Docker Hub Registry, GitHub & Jenkins Configurations](#setup-2-docker-hub-registry-github--jenkins-configurations)
+- [Setup 3: Jenkins Multibranch Pipeline](#setup-3-jenkins-multibranch-pipeline)
+- [Setup 4: ArgoCD](#setup-4-argocd)
+- [Setup 5: Prometheus & Grafana](#setup-5-prometheus--grafana)
+- [Result Images](#result-images)
+  - [1. Terraform Installation](#1-terraform-installation)
+  - [2. Jenkins Multibranch](#2-jenkins-multibranch)
+  - [3. ArgoCD](#3-argocd)
+    - [3.1 ArgoCD Data Source Connection](#31-argocd-data-source-connection)
+    - [3.2 ArgoCD Application (Dev)](#32-argocd-application-dev)
+    - [3.3 ArgoCD Application (Prd)](#33-argocd-application-prd)
+    - [3.4 ArgoCD Application (Helm)](#34-argocd-application-helm)
+  - [4. Prometheus](#4-prometheus)
+  - [5. Grafana](#5-grafana)
+
 ## Introduction
 
 1. **System Flow & Architecture**:
@@ -376,7 +395,7 @@
 ![ArgoCD 6](./result-images/result_3_argocd_6_prd.png)
 ![ArgoCD 7](./result-images/result_3_argocd_7_prd.png)
 
-### 3.3. ArgoCD Application (Helm)
+### 3.4. ArgoCD Application (Helm)
 
 ![ArgoCD 8](./result-images/result_3_argocd_8_helm.png)
 ![ArgoCD 9](./result-images/result_3_argocd_9_helm.png)
