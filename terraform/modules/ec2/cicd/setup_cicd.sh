@@ -119,7 +119,7 @@ sudo argocd login localhost:9080 --username admin --password $DEFAULT_ARGOCD_ADM
   --server localhost:9080 \
   --insecure
 
-# Install Jenkins by Docker
+# Install Jenkins by Docker, finally install the Docker inside the Jenkins container.
 docker run -p 8080:8080 -p 50000:50000 \
   -v jenkins_server:/var/jenkins_home \
   -v /var/run/docker.sock:/var/run/docker.sock \
@@ -128,6 +128,8 @@ docker run -p 8080:8080 -p 50000:50000 \
 sudo chmod 666 /var/run/docker.sock
 echo 'Jenkins installed'
 sudo docker ps | grep jenkins-server
+sudo docker exec -it -u root jenkins-server /bin/bash -c "apt-get update && apt-get install -y docker.io && docker --version"
+echo 'Installed Docker inside Jenkins container'
 
 # Install cAdvisor of Google to collect resource usage and performance characteristics of all containers
 # in this instance, even including the Jenkins server.
