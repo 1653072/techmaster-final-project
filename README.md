@@ -1,5 +1,13 @@
 # TECHMASTER - FINAL PROJECT
 
+## Introduction
+
+1. **System Flow & Architecture**:
+   - `TO BE DEFINED LATER`.
+
+2. **Notes**:
+   - `TO BE DEFINED LATER`.
+
 ## Setup 1: AWS EC2 Instances
 
 1. **Introduction**: In this section, we'll initialize some necessary AWS EC2 instances, including:
@@ -298,20 +306,99 @@
     - Step 4: For **node-exporter** which monitors system metrics of CICD and Kubernetes instances, we will use the
       existing dashboard template instead of building by our own one.
         - Step 4.1: Access the given link to select the expected dashboard template
-          ID: `https://grafana.com/grafana/dashboards/`.
-        - Step 4.2: Access the given link, then input our expected dashboard ID (or we can directly use this ID: **21650
-          **): `http://<monitoring_server_ip>:3000/dashboard/import`.
+          ID:
+            - `https://grafana.com/grafana/dashboards/`.
+        - Step 4.2: Access the given link, then input the expected dashboard ID (or we'll use this ID: **21650**):
+            - `http://<monitoring_server_ip>:3000/dashboard/import`.
         - Step 4.3: Load & select the expected Prometheus data source.
         - Step 4.4: Import the dashboard.
     - Step 5: For **cAdvisor** which monitors all metrics of Docker containers and the Jenkins container in the CICD
       instance, we will use another existing dashboard template.
-        - Step 5.1: Access the given link, then input the expected dashboard ID **893
-          **: `http://<monitoring_server_ip>:3000/dashboard/import`.
+        - Step 5.1: Access the given link, then input the expected dashboard ID **893**:
+            - `http://<monitoring_server_ip>:3000/dashboard/import`.
         - Step 5.2: Load & select the expected Prometheus data source.
         - Step 5.3: Import the dashboard.
     - Step 6: For **ArgoCD** which monitors all ArgoCD metrics in the CICD instance, we will use another existing
       dashboard template.
-        - Step 5.1: Access the given link, then input the expected dashboard ID **14584
-          **: `http://<monitoring_server_ip>:3000/dashboard/import`.
+        - Step 5.1: Access the given link, then input the expected dashboard ID **14584**:
+            - `http://<monitoring_server_ip>:3000/dashboard/import`.
         - Step 5.2: Load & select the expected Prometheus data source.
         - Step 5.3: Import the dashboard.
+
+## Result Images
+
+### 1. Terraform Installation
+   
+![Terraform 1](./result-images/result_1_terraform_1.png)
+![Terraform 2](./result-images/result_1_terraform_2.png)
+![Terraform 3](./result-images/result_1_terraform_3.png)
+![Terraform 4](./result-images/result_1_terraform_4.png)
+![Terraform 5](./result-images/result_1_terraform_5.png)
+![Terraform 6](./result-images/result_1_terraform_6.png)
+![Terraform 7](./result-images/result_1_terraform_7.png)
+![Terraform 8](./result-images/result_1_terraform_8.png)
+![Terraform 9](./result-images/result_1_terraform_9.png)
+![Terraform 10](./result-images/result_1_terraform_10.png)
+![Terraform 11](./result-images/result_1_terraform_11.png)
+![Terraform 12](./result-images/result_1_terraform_12.png)
+![Terraform 13](./result-images/result_1_terraform_13.png)
+![Terraform 14](./result-images/result_1_terraform_14.png)
+
+### 2. Jenkins Multibranch
+
+![Jenkins 1](./result-images/result_2_jenkins_multibranch_1.png)
+![Jenkins 2](./result-images/result_2_jenkins_multibranch_2.png)
+![Jenkins 3](./result-images/result_2_jenkins_multibranch_3.png)
+![Jenkins 4](./result-images/result_2_jenkins_multibranch_4.png)
+![Jenkins 5](./result-images/result_2_jenkins_multibranch_5.png)
+![Jenkins 6](./result-images/result_2_jenkins_multibranch_6.png)
+![Jenkins 7](./result-images/result_2_jenkins_multibranch_7.png)
+![Jenkins 8](./result-images/result_2_jenkins_multibranch_8.png)
+![Jenkins 9](./result-images/result_2_jenkins_multibranch_9.png)
+![Jenkins 10](./result-images/result_2_jenkins_multibranch_10.png)
+![Jenkins 11](./result-images/result_2_jenkins_multibranch_11.png)
+
+### 3. ArgoCD
+
+### 3.1. ArgoCD Data Source Connection
+
+![ArgoCD 1](./result-images/result_3_argocd_1_connect_repository.png)
+
+### 3.2. ArgoCD Application (Dev)
+
+![ArgoCD 2](./result-images/result_3_argocd_2_dev.png)
+![ArgoCD 3](./result-images/result_3_argocd_3_dev.png)
+![ArgoCD 4](./result-images/result_3_argocd_4_dev.png)
+
+### 3.3. ArgoCD Application (Prd)
+
+![ArgoCD 5](./result-images/result_3_argocd_5_prd.png)
+![ArgoCD 6](./result-images/result_3_argocd_6_prd.png)
+![ArgoCD 7](./result-images/result_3_argocd_7_prd.png)
+
+### 3.3. ArgoCD Application (Helm)
+
+![ArgoCD 8](./result-images/result_3_argocd_8_helm.png)
+![ArgoCD 9](./result-images/result_3_argocd_9_helm.png)
+![ArgoCD 10](./result-images/result_3_argocd_10_helm.png)
+![ArgoCD 11](./result-images/result_3_argocd_11_helm.png)
+![ArgoCD 12](./result-images/result_3_argocd_12_helm.png)
+![ArgoCD 13](./result-images/result_3_argocd_13_helm.png)
+
+### 4. Prometheus
+
+![Prometheus 1](./result-images/result_4_prometheus_1_target_health.png)
+![Prometheus 2](./result-images/result_4_prometheus_2_cadvisor.png)
+![Prometheus 3](./result-images/result_4_prometheus_3_cadvisor.png)
+![Prometheus 4](./result-images/result_4_prometheus_4_argocd.png)
+![Prometheus 5](./result-images/result_4_prometheus_5_argocd.png)
+
+### 5. Grafana
+
+![Grafana 1](./result-images/result_5_grafana_1_data_source.png)
+![Grafana 2](./result-images/result_5_grafana_2_node_exporter.png)
+![Grafana 3](./result-images/result_5_grafana_3_node_exporter.png)
+![Grafana 4](./result-images/result_5_grafana_4_cadvisor.png)
+![Grafana 5](./result-images/result_5_grafana_5_argocd.png)
+![Grafana 6](./result-images/result_5_grafana_6_argocd.png)
+![Grafana 7](./result-images/result_5_grafana_7_argocd.png)
