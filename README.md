@@ -154,7 +154,7 @@
    - Kind: Username with password
    - ID: GITHUB_PERSONAL_ACCESS_TOKEN
    - Username: 1653072
-   - Password: <github_personal_access_token> (You generated this token in the previous step: "Techmaster|DevOps|FinalProject|Jenkins")
+   - Password: <github_personal_access_token> (We generated this token in the previous step: "Techmaster|DevOps|FinalProject|Jenkins")
    4. Final Project K8S Manifest Repository URL:
    - Kind: Secret text
    - ID: FINAL_PROJECT_MANIFEST_REPO_URL
@@ -269,5 +269,49 @@
 
 ## Setup 5: Prometheus & Grafana
 
-- TBD
+1. **Prometheus**:
+    - We can check the health of our targets through Prometheus by accessing this
+      URL: `http://<monitoring_server_ip>:9090/targets`.
+    - In the Target Health section, we should see these targets:
+        - CICD instance:
+            - argocd-metrics
+            - argocd-repo-server-metrics
+            - argocd-server-metrics
+            - cadvisor
+            - node_exporter
+        - Kubernetes instance:
+            - node_exporter
+        - Monitoring instance:
+            - local prometheus
 
+2. **Grafana**:
+    - Step 1: We need to access the Grafana through this URL: `http://<monitoring_server_ip>:3000`
+    - Step 2: We access with both username and password by this value: `admin`, then we can change to another password
+      as we want.
+    - Step 3: We need to add the Prometheus Data Source to Grafana.
+        - Step 3.1: Access this link: `http://<monitoring_server_ip>:3000/connections/datasources/prometheus`.
+        - Step 3.2: Press this button: `Add new data source`.
+        - Step 3.3: Input this name: `techmaster-final-project`.
+        - Step 3.4: Input this Prometheus server URL: `http://<monitoring_server_ip>:9090`.
+        - Step 3.5: We can change the Scrape Interval & Query timeout (if any).
+        - Step 3.6: Save & Test.
+    - Step 4: For **node-exporter** which monitors system metrics of CICD and Kubernetes instances, we will use the
+      existing dashboard template instead of building by our own one.
+        - Step 4.1: Access the given link to select the expected dashboard template
+          ID: `https://grafana.com/grafana/dashboards/`.
+        - Step 4.2: Access the given link, then input our expected dashboard ID (or we can directly use this ID: **21650
+          **): `http://<monitoring_server_ip>:3000/dashboard/import`.
+        - Step 4.3: Load & select the expected Prometheus data source.
+        - Step 4.4: Import the dashboard.
+    - Step 5: For **cAdvisor** which monitors all metrics of Docker containers and the Jenkins container in the CICD
+      instance, we will use another existing dashboard template.
+        - Step 5.1: Access the given link, then input the expected dashboard ID **893
+          **: `http://<monitoring_server_ip>:3000/dashboard/import`.
+        - Step 5.2: Load & select the expected Prometheus data source.
+        - Step 5.3: Import the dashboard.
+    - Step 6: For **ArgoCD** which monitors all ArgoCD metrics in the CICD instance, we will use another existing
+      dashboard template.
+        - Step 5.1: Access the given link, then input the expected dashboard ID **14584
+          **: `http://<monitoring_server_ip>:3000/dashboard/import`.
+        - Step 5.2: Load & select the expected Prometheus data source.
+        - Step 5.3: Import the dashboard.
