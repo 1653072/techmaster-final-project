@@ -102,7 +102,7 @@ for ip in ${CICD_INSTANCE_PUBLIC_IPS}; do
 
   # Login to the ArgoCD server with the insecure mode.
   echo "Trying to login to ArgoCD server at $ARGOCD_HOST..."
-  until sudo argocd login $ARGOCD_HOST --username admin --password $INITIAL_ARGOCD_ADMIN_PASSWORD --insecure; do
+  until sudo argocd login $ARGOCD_HOST --username admin --password ${INITIAL_ARGOCD_ADMIN_PASSWORD} --insecure; do
     echo "Failed to login to ArgoCD server at $ARGOCD_HOST. Retrying in 10 seconds..."
     sleep 10
   done

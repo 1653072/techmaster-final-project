@@ -115,7 +115,7 @@ export DEFAULT_ARGOCD_ADMIN_PASSWORD=$(sudo kubectl -n argocd get secret argocd-
 sudo argocd login localhost:9080 --username admin --password $DEFAULT_ARGOCD_ADMIN_PASSWORD --insecure && sudo argocd account update-password \
   --account admin \
   --current-password $DEFAULT_ARGOCD_ADMIN_PASSWORD \
-  --new-password $INITIAL_ARGOCD_ADMIN_PASSWORD \
+  --new-password ${INITIAL_ARGOCD_ADMIN_PASSWORD} \
   --server localhost:9080 \
   --insecure
 
