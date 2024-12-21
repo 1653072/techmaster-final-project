@@ -5,7 +5,6 @@ variable "default_region" {
 
 variable "initial_argocd_admin_password" {
   type        = string
-  sensitive   = true
   description = "Initial ArgoCD Admin password"
 }
 

@@ -44,6 +44,9 @@
    // Destroy all Terraform resources (EC2, SecurityGroup, NetworkInterfaces, etc).
    // We should run this command at the last stage of development to delete all resources.
    terraform destroy --var-file=./terraform.tfvars -auto-approve
+   
+   // Each instance needs time to intialize services and respective configs, we can use this command to check their logs:
+   tail -f 100 /var/log/cloud-init-output.log
    ```
 
 3. **Public ports**:
@@ -205,39 +208,42 @@
    ```
 
 2. **ArgoCD Applications**:
-   - Instruction to create a new application for the **dev** environment:
-     - Step 1: `http://<argocd_server_ip>:9080` -> `ArgoCD Dashboard` -> `+ New App`.
-     - Step 2: In the general section, fill the application name by `techmaster-final-project-obo-dev`.
-     - Step 3: In the general section, fill the project name by `default`.
-     - Step 4: In the general section, enable `Automatic` sync prolicy with the `Self Heal` mode.
-     - Step 5: In the source section, fill the repository url by `git@github.com:1653072/techmaster-final-project-obo-manifest.git`.
-     - Step 6: In the source section, fill the revision by `develop`.
-     - Step 7: In the source section, fill the path by `templates`.
-     - Step 8: In the destination section, fill the cluster URL by `http://<kubernetes_server_ip>:6443`.
-     - Step 9: In the destination section, fill the namespace by `dev`.
-     - Step 10: Click `Create`.
-   - Instruction to create a new application for the **prd** environment:
-     - Step 1: `http://<argocd_server_ip>:9080` -> `ArgoCD Dashboard` -> `+ New App`.
-     - Step 2: In the general section, fill the application name by `techmaster-final-project-obo-prd`.
-     - Step 3: In the general section, fill the project name by `default`.
-     - Step 4: In the general section, enable `Automatic` sync prolicy with the `Self Heal` mode.
-     - Step 5: In the source section, fill the repository url by `git@github.com:1653072/techmaster-final-project-obo-manifest.git`.
-     - Step 6: In the source section, fill the revision by `release`.
-     - Step 7: In the source section, fill the path by `templates`.
-     - Step 8: In the destination section, fill the cluster URL by `http://<kubernetes_server_ip>:6443`.
-     - Step 9: In the destination section, fill the namespace by `prd`.
-     - Step 10: Click `Create`.
-   - Instruction to create a new **helm** application for testing and changing parameters:
-     - Step 1: `http://<argocd_server_ip>:9080` -> `ArgoCD Dashboard` -> `+ New App`.
-     - Step 2: In the general section, fill the application name by `techmaster-final-project-obo-helm`.
-     - Step 3: In the general section, fill the project name by `default`.
-     - Step 4: In the general section, enable `Automatic` sync prolicy with the `Self Heal` mode.
-     - Step 5: In the source section, fill the repository url by `git@github.com:1653072/techmaster-final-project-obo-manifest.git`.
-     - Step 6: In the source section, fill the revision by `master`.
-     - Step 7: In the source section, fill the path by `helm-templates`.
-     - Step 8: In the destination section, fill the cluster URL by `https://kubernetes.default.svc/`.
-     - Step 9: In the destination section, fill the namespace by `default`.
-     - Step 10: Click `Create`.
+    - Instruction to create a new application for the **dev** environment:
+        - Step 1: `http://<argocd_server_ip>:9080` -> `ArgoCD Dashboard` -> `+ New App`.
+        - Step 2: In the general section, fill the application name by `techmaster-final-project-obo-dev`.
+        - Step 3: In the general section, fill the project name by `default`.
+        - Step 4: In the general section, enable `Automatic` sync prolicy with the `Self Heal` mode.
+        - Step 5: In the source section, fill the repository url
+          by `git@github.com:1653072/techmaster-final-project-obo-manifest.git`.
+        - Step 6: In the source section, fill the revision by `develop`.
+        - Step 7: In the source section, fill the path by `templates`.
+        - Step 8: In the destination section, fill the cluster URL by `http://<kubernetes_server_ip>:6443`.
+        - Step 9: In the destination section, fill the namespace by `dev`.
+        - Step 10: Click `Create`.
+    - Instruction to create a new application for the **prd** environment:
+        - Step 1: `http://<argocd_server_ip>:9080` -> `ArgoCD Dashboard` -> `+ New App`.
+        - Step 2: In the general section, fill the application name by `techmaster-final-project-obo-prd`.
+        - Step 3: In the general section, fill the project name by `default`.
+        - Step 4: In the general section, enable `Automatic` sync prolicy with the `Self Heal` mode.
+        - Step 5: In the source section, fill the repository url
+          by `git@github.com:1653072/techmaster-final-project-obo-manifest.git`.
+        - Step 6: In the source section, fill the revision by `release`.
+        - Step 7: In the source section, fill the path by `templates`.
+        - Step 8: In the destination section, fill the cluster URL by `http://<kubernetes_server_ip>:6443`.
+        - Step 9: In the destination section, fill the namespace by `prd`.
+        - Step 10: Click `Create`.
+    - Instruction to create a new **helm** application for testing and changing parameters:
+        - Step 1: `http://<argocd_server_ip>:9080` -> `ArgoCD Dashboard` -> `+ New App`.
+        - Step 2: In the general section, fill the application name by `techmaster-final-project-obo-helm`.
+        - Step 3: In the general section, fill the project name by `default`.
+        - Step 4: In the general section, enable `Automatic` sync prolicy with the `Self Heal` mode.
+        - Step 5: In the source section, fill the repository url
+          by `git@github.com:1653072/techmaster-final-project-obo-manifest.git`.
+        - Step 6: In the source section, fill the revision by `master`.
+        - Step 7: In the source section, fill the path by `helm-templates`.
+        - Step 8: In the destination section, fill the cluster URL by `https://kubernetes.default.svc/`.
+        - Step 9: In the destination section, fill the namespace by `default`.
+        - Step 10: Click `Create`.
 
 ## Setup 5: Prometheus & Grafana
 
