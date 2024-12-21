@@ -55,6 +55,12 @@ sudo kubectl create namespace dev
 sudo kubectl create namespace prd
 sudo kubectl get nodes --all-namespaces
 
+# Install ArgoCD CLI
+export ARGOCD_VERSION=$(curl -L -s https://raw.githubusercontent.com/argoproj/argo-cd/stable/VERSION)
+sudo curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/download/v$ARGOCD_VERSION/argocd-linux-amd64
+sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+sudo rm argocd-linux-amd64
+
 # Register the current K3S Server Cluster Context to the ArgoCD K8S Cluster in the CICD instance
 # ---
 # Documents:
@@ -84,10 +90,26 @@ sudo sed -i '/ExecStart=/c\ExecStart=/usr/local/bin/k3s server --tls-san '"$CURR
 sudo systemctl daemon-reload
 sudo systemctl restart k3s
 # ---
-export ARGOCD_SERVER_PORT="9080"
 for ip in ${CICD_INSTANCE_PUBLIC_IPS}; do
-  # Login to the ArgoCD server with auto approval, then we add the current kubeconfig context to the ArgoCD server with auto approval and the upsert mechanism.
-  sudo argocd login "$ip:$ARGOCD_SERVER_PORT" --username admin --password $INITIAL_ARGOCD_ADMIN_PASSWORD --insecure && sudo argocd cluster add $CURRENT_KUBECONFIG_CONTEXT_NAME --yes --insecure --upsert --kubeconfig $CURRENT_KUBECONFIG_PATH_FOR_ARGOCD
+  export ARGOCD_HOST="$ip:9080"
+
+  # Check the ArgoCD server availability.
+  echo "Checking ArgoCD server at $ARGOCD_HOST..."
+  until curl -k --fail "http://$ARGOCD_HOST"; do
+      echo "ArgoCD API at $ARGOCD_HOST is not ready. Retrying in 10 seconds..."
+      sleep 10
+  done
+
+  # Login to the ArgoCD server with the insecure mode.
+  echo "Trying to login to ArgoCD server at $ARGOCD_HOST..."
+  until sudo argocd login $ARGOCD_HOST --username admin --password $INITIAL_ARGOCD_ADMIN_PASSWORD --insecure; do
+    echo "Failed to login to ArgoCD server at $ARGOCD_HOST. Retrying in 10 seconds..."
+    sleep 10
+  done
+
+  # Add the current kubeconfig context to the ArgoCD server with the auto approval, insecure mode, and upsert cluster config mechanism.
+  echo "Successfully login to ArgoCD server at $ARGOCD_HOST. Proceeding with login and cluster registration..."
+  sudo argocd cluster add $CURRENT_KUBECONFIG_CONTEXT_NAME --yes --insecure --upsert --kubeconfig $CURRENT_KUBECONFIG_PATH_FOR_ARGOCD
 done
 
 # [NodeExporter] Step 1: Installation

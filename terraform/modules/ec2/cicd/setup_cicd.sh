@@ -38,7 +38,13 @@ sudo systemctl enable docker
 docker --version
 docker-compose --version
 
-# [ArgoCD] Step 1:
+# [ArgoCD] Step 1: Install ArgoCD CLI
+export ARGOCD_VERSION=$(curl -L -s https://raw.githubusercontent.com/argoproj/argo-cd/stable/VERSION)
+sudo curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/download/v$ARGOCD_VERSION/argocd-linux-amd64
+sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+sudo rm argocd-linux-amd64
+
+# [ArgoCD] Step 2:
 # - Install K8S by using the K3S.
 # - Update mod for the "k3s.yaml" file to allow "user=nobody" in systemd to read it.
 sudo curl -sfL https://get.k3s.io | sh -
@@ -49,19 +55,18 @@ sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo kubectl get nodes
 sudo kubectl version
 
-# [ArgoCD] Step 2:
+# [ArgoCD] Step 3:
 # - Install and Run ArgoCD K8S.
-# - Update the "argocd-server" service type to LoadBalancer.
-# - Wait for all ArgoCD pods to be ready before going to next steps with the max timeout 120 seconds.
+# - Update the "argocd-server" service type to LoadBalancer to expose the ArgoCD APIs for external access
+# on the 9080 port which forwards to 443.
+# - Wait for all ArgoCD pods to be ready before going to next steps with the max timeout 180 seconds.
 sudo kubectl create namespace argocd
 sudo kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 sudo kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
-sudo kubectl wait --namespace argocd \
-  --for=condition=Ready pod \
-  --selector=app.kubernetes.io/part-of=argocd \
-  --timeout=120s
+sudo kubectl get pods -n argocd -o wide
+sudo kubectl wait -n argocd --for=condition=Ready pod --all --timeout=180s
 
-# [ArgoCD] Step 3: Create the systemd service file for ArgoCD K8S Port-Forward
+# [ArgoCD] Step 4: Create the systemd service file for ArgoCD K8S Port-Forward
 # - Format: Host_Port -> K8S_Service_Port
 # - argocd-server (UI website & APIs): 9080 -> 443
 # - argocd-metrics (Overall metrics): 9082 -> 8082
@@ -99,17 +104,11 @@ RestartSec=5s
 WantedBy=default.target
 EOL"
 
-# [ArgoCD] Step 4: Start ArgoCD K8S Port-Forward through the systemd service
+# [ArgoCD] Step 5: Start ArgoCD K8S Port-Forward through the systemd service
 sudo systemctl daemon-reload # Reload the systemd daemon
 sudo systemctl start argocd_port_forward # Start the service
 sudo systemctl enable argocd_port_forward # Enable the service to start on boot
 sudo systemctl status argocd_port_forward # Verify that the service is running
-
-# [ArgoCD] Step 5: Install ArgoCD CLI
-export VERSION=$(curl -L -s https://raw.githubusercontent.com/argoproj/argo-cd/stable/VERSION)
-sudo curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/download/v$VERSION/argocd-linux-amd64
-sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
-sudo rm argocd-linux-amd64
 
 # [ArgoCD] Step 6: Automatically change the default ArgoCD Admin password to the initial given password through the "argocd-server" service
 export DEFAULT_ARGOCD_ADMIN_PASSWORD=$(sudo kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
@@ -131,7 +130,7 @@ echo 'Jenkins installed'
 sudo docker ps | grep jenkins-server
 
 # Install cAdvisor of Google to collect resource usage and performance characteristics of all containers
-# in this instance, even including the Jenkins and ArgoCD.
+# in this instance, even including the Jenkins server.
 # We'll grants this Docker "cAdvisor" container root capabilities to all devices on the host system.
 docker run -itd \
   --name=cadvisor-server \
