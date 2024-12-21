@@ -109,44 +109,63 @@
           - In the scopes section, we will select the whole "repo" scope and the "user:email" field in the "user" scope.
           ```
 
-3. **Jenkins Plugins**: We should install these necessary Jenkins plugins to easily support our in system operation.
-    ```
-    Instruction: http://<jenkins_server_ip>:8080 -> Jenkins Dashboard -> Manage Jenkins -> Manage Plugins -> Available tab.
-    Plugins:
-    1. Blue Ocean: Have a better visualization of pipelines, builds and deployments.
-    2. Pipeline Utility Steps: Provide utility steps for pipeline jobs.
-    3. Kubernetes CLI: Integrate K8S CLI with necessary commands to Jenkins.
-    ```
+3. **Jenkins Initial Admin Password**: We need to find out the initial admin password of Jenkins with following steps:
+   ```
+   Instruction
+   - Step 1: Connect to the CICD EC2 instance.
+   - Step 2: Run this command: 
+   $ docker exec -it jenkins-server /bin/sh -c "cat /var/jenkins_home/secrets/initialAdminPassword"
+   ```
 
-4. **Jenkins Credentials**: We need to add crucial credentials to Jenkins, which helps it have ability to deploy new
+4. **Jenkins Plugins**:
+    - Firstly, we need to install suggested plugins after loging in Jenkins with the initial admin password above.
+    - Secondly, we need to create a new admin account:
+      ```
+      Instruction:
+      - Username: admin
+      - Password: admin@123
+      - Full name: Admin
+      - Email: example@gmail.com
+      ```
+    - Besides installing suggested plugins from Jenkins, we should install these necessary Jenkins
+      plugins to easily support our in system operation.
+      ```
+      Instruction: http://<jenkins_server_ip>:8080 -> Jenkins Dashboard -> Manage Jenkins -> Plugins -> Available Plugins.
+      Plugins:
+      1. Blue Ocean: Have a better visualization of pipelines, builds and deployments.
+      2. Pipeline Utility Steps: Provide utility steps for pipeline jobs.
+      3. Kubernetes CLI: Integrate K8S CLI with necessary commands to Jenkins.
+      ```
+
+5. **Jenkins Credentials**: We need to add crucial credentials to Jenkins, which helps it have ability to deploy new
    images to Docker Hub and new changes to GitHub.
-    ```
-    Instruction: http://<jenkins_server_ip>:8080 -> Jenkins Dashboard -> Manage Jenkins -> Manage Credentials -> Global (or create a new folder) -> Add Credentials
-    Crucial credentials:
-    1. Docker Registry Username:
-        - Kind: Secret text
-        - ID: DOCKER_REGISTRY_USERNAME
-        - Secret: quoctran08
-    2. Docker Registry Password:
-        - Kind: Secret text
-        - ID: DOCKER_REGISTRY_PASSWORD
-        - Secret: <docker_hub_account_password>
-    3. GitHub Personal Access Token:
-        - Kind: Username with password
-        - ID: GITHUB_PERSONAL_ACCESS_TOKEN 
-        - Username: 1653072
-        - Password: <github_personal_access_token> (You generated this token in the previous step: "Techmaster|DevOps|FinalProject|Jenkins")
-    4. Final Project K8S Manifest Repository URL:
-        - Kind: Secret text
-        - ID: FINAL_PROJECT_MANIFEST_REPO_URL
-        - Secret: https://github.com/1653072/techmaster-final-project-obo-manifest.git
-    5. Final Project K8S Manifest Repository Name:
-        - Kind: Secret text
-        - ID: FINAL_PROJECT_MANIFEST_REPO_NAME
-        - Secret: techmaster-final-project-obo-manifest
-    ```
+   ```
+   Instruction: http://<jenkins_server_ip>:8080 -> Jenkins Dashboard -> Manage Jenkins -> Credentials -> Global (or create a new folder) -> Add Credentials
+   Crucial credentials:
+   1. Docker Registry Username:
+   - Kind: Secret text
+   - ID: DOCKER_REGISTRY_USERNAME
+   - Secret: quoctran08
+   2. Docker Registry Password:
+   - Kind: Secret text
+   - ID: DOCKER_REGISTRY_PASSWORD
+   - Secret: <docker_hub_account_password>
+   3. GitHub Personal Access Token:
+   - Kind: Username with password
+   - ID: GITHUB_PERSONAL_ACCESS_TOKEN
+   - Username: 1653072
+   - Password: <github_personal_access_token> (You generated this token in the previous step: "Techmaster|DevOps|FinalProject|Jenkins")
+   4. Final Project K8S Manifest Repository URL:
+   - Kind: Secret text
+   - ID: FINAL_PROJECT_MANIFEST_REPO_URL
+   - Secret: https://github.com/1653072/techmaster-final-project-obo-manifest.git
+   5. Final Project K8S Manifest Repository Name:
+   - Kind: Secret text
+   - ID: FINAL_PROJECT_MANIFEST_REPO_NAME
+   - Secret: techmaster-final-project-obo-manifest
+   ```
 
-5. **CICD Instance & GitHub connection**: To help CICD instance, especially ArgoCD, has essential permissions to access
+6. **CICD Instance & GitHub connection**: To help CICD instance, especially ArgoCD, has essential permissions to access
    our GitHub to pull and push code changes, we need to establish a new SSH key pair here.
    ```
    Instruction:
@@ -165,18 +184,21 @@
 
 ## Setup 3: Jenkins Multibranch Pipeline
 
-1. We need to create a new **Multibranch Pipeline** in Jenkins with these essential details:
-    - Display name: `techmaster-final-project`
+1. We need to create a new **Multibranch Pipeline** item in Jenkins with these essential details:
+    - Item name: `techmaster-final-project`.
+    - Display name: `techmaster-final-project`.
+    - Add source: `GitHub`.
     - Credentials: Select the `GitHub Personal Access Token` credential which was added in the previous step.
-    - Discover branches - strategy: `Exclude...`
-    - Discover pull requests from origin - strategy: `Merge the pull request with...`
+    - Repository HTTPS URL: `https://github.com/1653072/techmaster-final-project-obo.git`.
+    - Discover branches - strategy: `Exclude branches that are also filed as PRs`
+    - Discover pull requests from origin - strategy: `Merge the pull request with the current target branch revision`
     - Discover pull requests from forks:
-        - Strategy: `Merge the pull request with...`
-        - Trust: `From users with Admin...`
-    - Click `Add source`, then add the `Discover Tags` and the `Filter by name (with regular expression)` with this
-      value: `(develop|release|^v/\d+(?:).(d+)*)$)`
+        - Strategy: `Merge the pull request with the current target branch revision`
+        - Trust: `From users with Admin or Write permission`
+    - Click `Add`, then add the `Discover Tags` and the `Filter by name (with regular expression)` with this
+      value: `^(develop|release|v\d+\.\d+\.\d+)$`
     - Select the mode and script path with `Jenkinsfile`.
-    - Finally, we need to select `Discard old items` with `15` days and `10` max of old items.
+    - Finally, we need to select `Discard old items` with `7` days and `10` max of old items.
 
 2. To **see how Jenkins works**, we can add some random or test files to the master branch of the source code
    repository, then we will merge them to the `develop` and `release` branch.
@@ -212,7 +234,7 @@
         - Step 1: `http://<argocd_server_ip>:9080` -> `ArgoCD Dashboard` -> `+ New App`.
         - Step 2: In the general section, fill the application name by `techmaster-final-project-obo-dev`.
         - Step 3: In the general section, fill the project name by `default`.
-        - Step 4: In the general section, enable `Automatic` sync prolicy with the `Self Heal` mode.
+        - Step 4: In the general section, enable `Automatic` sync policy with the `Self Heal` mode.
         - Step 5: In the source section, fill the repository url
           by `git@github.com:1653072/techmaster-final-project-obo-manifest.git`.
         - Step 6: In the source section, fill the revision by `develop`.
@@ -224,7 +246,7 @@
         - Step 1: `http://<argocd_server_ip>:9080` -> `ArgoCD Dashboard` -> `+ New App`.
         - Step 2: In the general section, fill the application name by `techmaster-final-project-obo-prd`.
         - Step 3: In the general section, fill the project name by `default`.
-        - Step 4: In the general section, enable `Automatic` sync prolicy with the `Self Heal` mode.
+        - Step 4: In the general section, enable `Automatic` sync policy with the `Self Heal` mode.
         - Step 5: In the source section, fill the repository url
           by `git@github.com:1653072/techmaster-final-project-obo-manifest.git`.
         - Step 6: In the source section, fill the revision by `release`.
@@ -236,7 +258,7 @@
         - Step 1: `http://<argocd_server_ip>:9080` -> `ArgoCD Dashboard` -> `+ New App`.
         - Step 2: In the general section, fill the application name by `techmaster-final-project-obo-helm`.
         - Step 3: In the general section, fill the project name by `default`.
-        - Step 4: In the general section, enable `Automatic` sync prolicy with the `Self Heal` mode.
+        - Step 4: In the general section, enable `Automatic` sync policy with the `Self Heal` mode.
         - Step 5: In the source section, fill the repository url
           by `git@github.com:1653072/techmaster-final-project-obo-manifest.git`.
         - Step 6: In the source section, fill the revision by `master`.
