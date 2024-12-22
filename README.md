@@ -3,6 +3,8 @@
 ## Table of Content
 
 - [System Introduction](#introduction)
+  - [Terraform Design](#terraform-design)
+  - [CI/CD Flow Design](#cicd-flow-design)
 - [Setup 1: AWS EC2 Instances](#setup-1-aws-ec2-instances)
 - [Setup 2: Docker Hub Registry, GitHub & Jenkins Configurations](#setup-2-docker-hub-registry-github--jenkins-configurations)
 - [Setup 3: Jenkins Multibranch Pipeline](#setup-3-jenkins-multibranch-pipeline)
@@ -21,11 +23,13 @@
 
 ## System Introduction
 
-1. **System Flow & Architecture**:
-   - `TO BE DEFINED LATER`.
+### Terraform Design
 
-2. **Notes**:
-   - `TO BE DEFINED LATER`.
+![Terraform Design](./result-images/final_project_terraform_design.png)
+   
+### CI/CD Flow Design
+
+![CICD Flow Design](./result-images/final_project_cicd_flow_design.png)
 
 ## Setup 1: AWS EC2 Instances
 
