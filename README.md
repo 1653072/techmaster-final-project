@@ -3,30 +3,30 @@
 ## Table of Content
 
 - [System Introduction](#introduction)
-  - [Terraform Design](#terraform-design)
-  - [CI/CD Flow Design](#cicd-flow-design)
+    - [Terraform Design](#terraform-design)
+    - [CI/CD Flow Design](#cicd-flow-design)
 - [Setup 1: AWS EC2 Instances](#setup-1-aws-ec2-instances)
 - [Setup 2: Docker Hub Registry, GitHub & Jenkins Configurations](#setup-2-docker-hub-registry-github--jenkins-configurations)
 - [Setup 3: Jenkins Multibranch Pipeline](#setup-3-jenkins-multibranch-pipeline)
 - [Setup 4: ArgoCD](#setup-4-argocd)
 - [Setup 5: Prometheus & Grafana](#setup-5-prometheus--grafana)
 - [Result Images](#result-images)
-  - [1. Terraform Installation](#1-terraform-installation)
-  - [2. Jenkins Multibranch](#2-jenkins-multibranch)
-  - [3. ArgoCD](#3-argocd)
-    - [3.1 ArgoCD Data Source Connection](#31-argocd-data-source-connection)
-    - [3.2 ArgoCD Application (Dev)](#32-argocd-application-dev)
-    - [3.3 ArgoCD Application (Prd)](#33-argocd-application-prd)
-    - [3.4 ArgoCD Application (Helm)](#34-argocd-application-helm)
-  - [4. Prometheus](#4-prometheus)
-  - [5. Grafana](#5-grafana)
+    - [1. Terraform Installation](#1-terraform-installation)
+    - [2. Jenkins Multibranch](#2-jenkins-multibranch)
+    - [3. ArgoCD](#3-argocd)
+        - [3.1 ArgoCD Data Source Connection](#31-argocd-data-source-connection)
+        - [3.2 ArgoCD Application (Dev)](#32-argocd-application-dev)
+        - [3.3 ArgoCD Application (Prd)](#33-argocd-application-prd)
+        - [3.4 ArgoCD Application (Helm)](#34-argocd-application-helm)
+    - [4. Prometheus](#4-prometheus)
+    - [5. Grafana](#5-grafana)
 
 ## System Introduction
 
 ### Terraform Design
 
 ![Terraform Design](./result-images/final_project_terraform_design.png)
-   
+
 ### CI/CD Flow Design
 
 ![CICD Flow Design](./result-images/final_project_cicd_flow_design.png)
@@ -205,13 +205,15 @@
    -> $ ssh-keygen (Then, just keep moving next steps)
    3. Print and save both public and private generated keys:
    -> $ cat ~/.ssh/<key_file_name> (This private key will be used to configurate the ArgoCD Repositories later, just keep it now)
-   -> $ cat ~/.ssh/<key_file_name>.pub (This public key will be used to configurate the GitHub SSH Keys in the next step)
+   -> $ cat ~/.ssh/<key_file_name>.pub (This public key will be used to configurate the GitHub SSH Keys in the next 4th step below)
    4. Access the GitHub and add the new SSH key:
    -> URL: https://github.com/settings/ssh/new
    -> Title: "Techmaster|DevOps|FinalProject|CICD"
    -> Key Type: Authentication Key
    -> Key: <put_cicd_instance_public_key_here>
    ```
+    - Notice: In this case, we are creating 1 SSH key for 2 different targets, including ArgoCD (private key) & GitHub
+      SSH (public key). However, it will be better to have each SSH key for each service.
 
 ## Setup 3: Jenkins Multibranch Pipeline
 
@@ -351,7 +353,7 @@
 ## Result Images
 
 ### 1. Terraform Installation
-   
+
 ![Terraform 1](./result-images/result_1_terraform_1.png)
 ![Terraform 2](./result-images/result_1_terraform_2.png)
 ![Terraform 3](./result-images/result_1_terraform_3.png)
